@@ -1,0 +1,26 @@
+{
+  "lse": {
+    "issave_figure": false,
+    "isplot": false,
+    "std_filter": 0.3,
+    "g_constant": 9.81,
+    "joint6": {
+      "fit_method": "4POL"
+    },
+    "joint5": {
+      "fit_method": "4POL"
+    },
+    "joint4": {
+      "fit_method": "4POL"
+    },
+    "joint3": {
+      "fit_method": "4POL"
+    },
+    "joint2": {
+      "fit_method": "1POL"
+    },
+    "joint1": {
+      "fit_method": "4POL"
+    }
+  }
+}
