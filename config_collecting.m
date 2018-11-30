@@ -1,7 +1,9 @@
 classdef config_collecting
-%  Institute: The Chinese University of Hong Kong
 %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
 %  Created on: 2018-10-05
+%  Copyright (c)  2018, The Chinese University of Hong Kong
+%  This software is provided "as is" under BSD License, with
+%  no warranty. The complete license can be found in LICENSE
 
    properties
       root_data_path
@@ -12,8 +14,6 @@ classdef config_collecting
       neg_joint_range
       pos_joint_range_list 
       neg_joint_range_list 
-      is_path_planning
-      is_collecting_data
       is_neg_dir
       is_pos_dir
       arm_name 
@@ -34,13 +34,11 @@ classdef config_collecting
                                        root_data_path,...
                                        sample_num,...
                                        init_joint_range,...
-                                       is_path_planning,...
-                                       is_collecting_data,...
                                        is_pos_dir,...
                                        is_neg_dir,...
                                        steady_time,...
                                        repeat_times)
-          if nargin >= 12
+          if nargin >= 10
             obj.Theta_Joint_No = Theta_Joint_No;
             obj.Train_Joint_No = Train_Joint_No;
             obj.init_joint_range = num2cell(init_joint_range.'); 
@@ -48,8 +46,6 @@ classdef config_collecting
             obj.root_data_path = root_data_path;
             obj.pos_joint_range = obj.init_joint_range; 
             obj.sample_num = sample_num;
-            obj.is_path_planning = is_path_planning;
-            obj.is_collecting_data = is_collecting_data;
             obj.is_pos_dir = is_pos_dir;
             obj.is_neg_dir = is_neg_dir;
             obj.steady_time = steady_time;
@@ -60,9 +56,9 @@ classdef config_collecting
           end
             if ischar(root_data_path)
                 obj.root_data_path = root_data_path;
-                obj.pos_data_path = strcat(root_data_path,'/',arm_name,'/Train_Joint',...
+                obj.pos_data_path = strcat(root_data_path,'/Train_Joint',...
                     num2str(Train_Joint_No),'/data_pos');
-                obj.neg_data_path = strcat(root_data_path,'/',arm_name,'/Train_Joint',...
+                obj.neg_data_path = strcat(root_data_path,'/Train_Joint',...
                     num2str(Train_Joint_No),'/data_neg');
             else
                 Error('root data path is not string');

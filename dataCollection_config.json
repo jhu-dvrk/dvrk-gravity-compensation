@@ -1,8 +1,6 @@
 {
   "data_collection": {
-    "is_path_planning": true,
-    "is_collecting_data": true,
-    "output_data_root_path": "./../GC_Data_stable_test",
+    "output_data_root_path": "./../GC_data_stable",
     "is_pos_dir": true,
     "is_neg_dir": true,
     "sample_num": 10,
@@ -51,7 +49,7 @@
         0,
         0,
         0,
-        0,
+        90,
         0,
         0
       ],
@@ -77,7 +75,7 @@
           0,
           0,
           0,
-          0,
+          90,
           0,
           0
         ],
@@ -86,7 +84,7 @@
           0,
           0,
           0,
-          0,
+          90,
           0,
           0
         ]
@@ -96,7 +94,7 @@
       "train_angle_min": -34,
       "train_angle_delta": 1,
       "Theta_Joint_No": 2,
-      "theta_angle_max": 40,
+      "theta_angle_max": 20,
       "theta_angle_min": -14,
       "theta_angle_delta": 2,
       "couple_upper_limit": 16,
@@ -108,12 +106,12 @@
         0,
         0,
         0,
-        0,
+        90,
         0,
         0
       ],
       "Train_Joint_No": 2,
-      "train_angle_max": 40,
+      "train_angle_max": 23,
       "train_angle_min": -14,
       "train_angle_delta": 1,
       "repeat_times": 10
@@ -124,7 +122,7 @@
         0,
         0,
         0,
-        0,
+        90,
         0,
         0
       ],

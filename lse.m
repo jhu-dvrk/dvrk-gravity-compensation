@@ -1,22 +1,23 @@
-function [output_param_map,output_param_full_map, output_param_rel_std_map] = LSE(input_param_map,...
+function [output_param_map,output_param_full_map, output_param_rel_std_map] = lse(input_param_map,...
                                                                                     input_param_rel_std_map,...
                                                                                     R2_augmented,... 
                                                                                     T2_augmented,...
-                                                                                    bool_Regressor_Mat,...
                                                                                     Train_Joint_No_list,...
                                                                                     Output_Param_Joint_No_list)
-%  Institute: The Chinese University of Hong Kong
 %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
 %  Created on: 2018-10-05
-%  Reference: This is a modified version of WPI Code
-%               link: https://github.com/WPI-AIM/dvrk_gravity_comp/blob/master/Final_Submission/MATLAB%20code/Regressor_and_Parameter_matrix/estimates_calulated.m
-   
+%  Copyright (c)  2018, The Chinese University of Hong Kong
+%  This software is provided "as is" under BSD License, with
+%  no warranty. The complete license can be found in LICENSE
+
     param_num = size(R2_augmented,2);              
     %Set initial prior,  known_index(i)=1; known_parameter(i)={value}
     known_index = zeros(1,param_num);
     known_parameter = zeros(1,param_num);
     known_index(cell2mat(input_param_map.keys)) = 1;
     known_parameter(cell2mat(input_param_map.keys))=cell2mat(input_param_map.values);
+    
+    bool_Regressor_Mat = analytical_bool_regressor_mat();
     %Iterative Learning
     Trained_bool_Regressor_row = zeros(1,param_num);
     for i=1:size(Train_Joint_No_list,2)
@@ -78,3 +79,31 @@ function [output_param_map,output_param_full_map, output_param_rel_std_map] = LS
        output_param_rel_std_map(keys{i})  = values{i}; 
     end
 end
+
+function [ std_var_beta, rel_std_var_beta ] = std_dynamic_param( R2, T2, dynamic_param_vec )
+% Compute the standard deviation and relative std of estimated dynamic parameters
+    if size(R2,1)~=size(T2,1)
+        error(sprintf('The rows of regressor matrix = %d and torque matrix = %d are not equal',size(R2,1),size(T2,1)));
+    end
+
+    if size(dynamic_param_vec,2)~=1
+        error(sprintf('dynamic_param_vec should be a vector'));
+    end
+
+    if size(T2,2)~=1
+        error(sprintf('T2 should be a vector'));
+    end
+
+    if size(R2,2)~=size(dynamic_param_vec,1)
+        error(sprintf('The columns of regressor matrix = %d and rows of dynamic_param_vec = %d are not equal',size(R2,2),size(dynamic_param_vec,1)));
+    end
+
+
+    var_e = (norm(T2 - R2*dynamic_param_vec)^2)/(size(R2,1)-size(dynamic_param_vec,1));
+
+    std_var_beta = sqrt(diag(var_e* inv((R2.'*R2)) ));
+
+    rel_std_var_beta = std_var_beta*100/norm(std_var_beta);
+
+end
+

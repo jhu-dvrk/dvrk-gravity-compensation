@@ -1,7 +1,9 @@
 classdef config_lse
-%  Institute: The Chinese University of Hong Kong
 %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
 %  Created on: 2018-10-05
+%  Copyright (c)  2018, The Chinese University of Hong Kong
+%  This software is provided "as is" under BSD License, with
+%  no warranty. The complete license can be found in LICENSE
 
    properties
        Joint_No
