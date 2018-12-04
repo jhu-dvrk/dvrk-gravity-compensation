@@ -8,7 +8,7 @@ function output_file_str = mlse(dataCollection_info_str)
     argument_checking(dataCollection_info_str)
     
     % General Setting
-    output_file_str = "";
+    output_file_str = '';
    
     % Read JSON config input file dataCollection_info_str
     fid = fopen(dataCollection_info_str);
