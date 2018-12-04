@@ -12,7 +12,8 @@
             "type": "MTM",
             "io": "sawRobotIO1394-MTMR-31519.xml",
             "pid": "sawControllersPID-MTMR.xml",
-            "kinematic": "mtm.json"
+            "kinematic": "mtm.json",
+            "gravity-compensation": "gc-MTML-31519.json"
         }
         ,
         {
@@ -21,6 +22,7 @@
             "io": "sawRobotIO1394-MTML-41878.xml",
             "pid": "sawControllersPID-MTML.xml",
             "kinematic": "mtm.json"
+            "gravity-compensation": "gc-MTML-41878.json"
         }
     ]
 }
