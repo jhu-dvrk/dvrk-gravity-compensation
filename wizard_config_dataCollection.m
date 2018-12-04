@@ -23,6 +23,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     % Customized joint pose 
     joint_origin_pose = [0,0,0,0,0,0,0];
     joint_tele_pose = [0,0,0,0,90,0,0];
+    % Pose of Joint5 that most likely to hit upper plane
     joint_pose_1 = [0,0,0,0,167,0,0];
     
     % Create a parent data folder for each MTM to store data
@@ -91,7 +92,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     end    
     Joint_No = 3;
     joint_init_pos(2) = config.data_collection.joint3.theta_angle_max;
-    joint_init_pos(3) = config.data_collection.joint3.couple_lower_limit - joint_init_pos(2);
+    joint_init_pos(3) = config.data_collection.joint3.couple_upper_limit - 10 - joint_init_pos(2);
     param_name = 'couple_upper_limit';
     default_value = config.data_collection.joint3.couple_upper_limit;
     goal_msg = 'Moving MTM upward by increasing Joint#3, finish when distal links of MTM 10cm away from top panel of environment';;
@@ -236,7 +237,6 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
                                                   goal_msg,...
                                                   is_couple_limit)
     input_str = '';
-    clc;
     disp(sprintf('Setting Hard limit for when collecting data of Joint#%d ',Joint_No))
     disp(sprintf('Moving to init pose'));
     mtm_arm.move_joint(deg2rad(joint_init_pos));
@@ -253,7 +253,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
             disp(sprintf('Arm: %s',ARM_NAME));
             disp(sprintf('Joint_No: %d',Joint_No));
             disp(sprintf('Customized Param Name: %s',param_name));           
-            disp(sprintf('Recommend Value: [%s] = %d degree ',param_name,default_value));
+            disp(sprintf('Default Value: [%s] = %d degree ',param_name,default_value));
             disp(sprintf('Current Value: [%s] = %d degree', param_name,customized_value));
             disp('Increase the value by 1 degree: [i]');
             disp('Decrease the value by 1 degree: [d]');
@@ -286,7 +286,6 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
     % Hard Code
     Joint3_pos_min_limit = -35;
     input_str = '';
-    clc;
     disp(sprintf('Setting Hard limit for when collecting data of Joint#%d ',3))
     disp(sprintf('Moving to init pose'));
     mtm_arm.move_joint(deg2rad(joint_init_pos));
