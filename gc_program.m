@@ -7,6 +7,8 @@ function mtm_gc_controller = gc_program(ARM_NAME,SN)
     
     % argument input type checking
     arguement_checking(ARM_NAME,SN)
+    
+    disp(sprintf('The software has been developed with the support of BRME,CUHK.'));
 
     output_file_str = wizard_config_dataCollection(ARM_NAME, SN);
     output_file_str = dataCollection(output_file_str);
@@ -22,6 +24,6 @@ function arguement_checking(ARM_NAME,SN)
     end
     if~(strcmp(ARM_NAME,'MTML') | strcmp(ARM_NAME,'MTMR') )
         error(sprintf(['Input of argument ''ARM_NAME''= %s is error, you should input one of the string',...
-                       '[''MTML'',''MTMR'']'],ARM_NAME));
+                       '[''MTML'',''MTMR'']'],ARM_NAME));   
     end
 end
