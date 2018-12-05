@@ -1,31 +1,31 @@
 {
   "GC_controller": {
     "safe_upper_torque_limit": [
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1
+      0.2,
+      0.8,
+      0.6,
+      0.2,
+      0.2,
+      0.2,
+      0
     ],
     "safe_lower_torque_limit": [
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1
+      -0.2,
+      -0.1,
+      0,
+      -0.3,
+      -0.1,
+      -0.1,
+      0
     ],
-    "amplitude_vec": [
-      0.2,
-      0.4,
-      0.4,
-      0.2,
-      0.08,
-      0.08,
-      0.08
+    "GC_test_constant_vec": [
+      0.1,
+      0.05,
+      0.05,
+      0.05,
+      0.008,
+      0.008,
+      0.008
     ],
     "beta_vel_amplitude": [
       2,
@@ -44,7 +44,7 @@
           90,
           0,
           0],
-    "GC_test_error_rate_threshold": 45,
+    "GC_test_error_rate_threshold": 35,
     "GC_test": {
       "pos_1":[
           0,
