@@ -20,7 +20,8 @@ function output_file_str = mlse(dataCollection_info_str)
     fclose(fid);
     config = jsondecode(str);
     
-    input_data_path_with_date = config.input_data_path_with_date;
+    % Get the path
+    [input_data_path_with_date,name,ext] = fileparts(dataCollection_info_str);
     
     % display data input root path
     disp(' ');
@@ -54,7 +55,7 @@ function output_file_str = mlse(dataCollection_info_str)
     [config_lse_joint1,config_lse_joint2, config_lse_joint3,config_lse_joint4,config_lse_joint5,config_lse_joint6]=...
                         setting_lse(config,input_data_path_with_date);
 
-   % Multi-steps MLSE from Joint#6 to Joint#1.
+    % Multi-steps MLSE from Joint#6 to Joint#1.
     lse_mtm_one_joint(config_lse_joint6);
     lse_mtm_one_joint(config_lse_joint5, config_lse_joint6);
     lse_mtm_one_joint(config_lse_joint4, config_lse_joint5);
@@ -62,11 +63,20 @@ function output_file_str = mlse(dataCollection_info_str)
     lse_mtm_one_joint(config_lse_joint2 ,config_lse_joint3);
     output_dynamic_matrix = lse_mtm_one_joint(config_lse_joint1 ,config_lse_joint2);
 
-    % Save the output parameters for gravity compensation controller
+    % Save info into config
     config = rmfield(config,'data_collection');
     config.GC_controller.gc_dynamic_params_pos = output_dynamic_matrix(1:40)';
     config.GC_controller.gc_dynamic_params_neg = [output_dynamic_matrix(1:10);output_dynamic_matrix(41:70)]';
     config.version = '1.0';
+    
+    % Gravity compensation test
+    if ~gravity_compensation_test(config)
+        disp('Gravity compensation test fail.')
+        output_file_name = '';
+        return
+    end
+    
+    % Save the output parameters for gravity compensation controller
     output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     fid = fopen(output_file_str,'w');
     jsonStr = jsonencode(config);
@@ -419,5 +429,78 @@ function plot_fit_joint(Torques_data,...
     end
 end
 
+
+% Gravity compensation test
+function is_test_success =  gravity_compensation_test(config)
+    is_test_success = false;
+    
+    % General Setting
+    safe_upper_torque_limit = config.GC_controller.safe_upper_torque_limit;
+    safe_lower_torque_limit = config.GC_controller.safe_lower_torque_limit;
+    GC_test_constant_vec = config.GC_controller.GC_test_constant_vec;
+    Zero_Output_Joint_No = [];
+    beta_vel_amplitude = config.GC_controller.beta_vel_amplitude; 
+    GC_controllers = [];
+    ARM_NAME = config.ARM_NAME;
+    g = config.lse.g_constant; 
+   
+    % Load MTM GC Param
+    dynamic_params_pos = config.GC_controller.gc_dynamic_params_pos';
+    dynamic_params_neg = config.GC_controller.gc_dynamic_params_neg';
+  
+    % % Spawn GC Controllers and test
+    mtm_arm = mtm(ARM_NAME);
+    mtm_gc_controller= controller(mtm_arm,...
+                                  dynamic_params_pos,...
+                                  dynamic_params_neg,...
+                                  safe_upper_torque_limit,...
+                                  safe_lower_torque_limit,...
+                                  beta_vel_amplitude,...
+                                  g,...
+                                  Zero_Output_Joint_No,...                              
+                                  GC_test_constant_vec,...
+                                  ARM_NAME);
+                              
+    % Test Controller
+    disp(sprintf('Testing GC controller of %s performance',ARM_NAME));
+    disp(sprintf('Calculating "error rate" between predicted and measuring torques',ARM_NAME));
+    pos_name_cell = fieldnames(config.GC_controller.GC_test);
+    test_pos_mat = [];
+    abs_err_mat_MTM = [];
+    rel_err_mat_MTM = [];
+    for k=1:size(pos_name_cell)
+        test_pos_mat = [test_pos_mat,getfield(config.GC_controller.GC_test,pos_name_cell{k})];
+        [abs_err, rel_err] = mtm_gc_controller.controller_test(deg2rad(test_pos_mat(:,end)));
+        abs_err_mat_MTM= [abs_err_mat_MTM,abs_err];
+        rel_err_mat_MTM = [rel_err_mat_MTM,rel_err];
+    end
+    GC_controllers.abs_err = abs_err;
+    GC_controllers.rel_err = rel_err;
+    disp(sprintf('===================='));
+    disp(sprintf('Test Result for %s', ARM_NAME));
+    for j=1:size(pos_name_cell)
+    disp(sprintf('For Pose_%d Joint_No: [''absolute error''], [''error rate%%'']',j));
+        for k = 1:7
+            disp(sprintf('Joint%d:[%.4f], [%d%%]',k, abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100)));
+        end
+    end
+    for j=1:size(pos_name_cell)
+        for k = 1:7
+            if(int32(rel_err_mat_MTM(k,j)*100)>=config.GC_controller.GC_test_error_rate_threshold)
+                warning(sprintf('[Test Pos %d]: --%s Joint%d-- absolute torque error:[%.4f], error rate:[%d%%], has exceed the error rate threshold %d%%',...
+                                                j,ARM_NAME,k,...
+                                                abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100),...
+                                                config.GC_controller.GC_test_error_rate_threshold));
+                                            
+                return 
+            end
+        end
+    end
+    
+    % Move MTM to origin position
+    mtm_gc_controller.mtm_arm.move_joint(deg2rad(zeros(1,7)));
+ 
+    is_test_success = true;
+end
 
 

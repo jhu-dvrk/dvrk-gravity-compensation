@@ -30,7 +30,7 @@ function mtm_gc_controller = gc_controller(gc_controller_cofig_json)
     % General Setting
     safe_upper_torque_limit = config.GC_controller.safe_upper_torque_limit;
     safe_lower_torque_limit = config.GC_controller.safe_lower_torque_limit;
-    amplitude_vec = config.GC_controller.amplitude_vec;
+    GC_test_constant_vec = config.GC_controller.GC_test_constant_vec;
     Zero_Output_Joint_No = [];
     beta_vel_amplitude = config.GC_controller.beta_vel_amplitude; 
     GC_controllers = [];
@@ -51,46 +51,10 @@ function mtm_gc_controller = gc_controller(gc_controller_cofig_json)
                                   beta_vel_amplitude,...
                                   g,...
                                   Zero_Output_Joint_No,...                              
-                                  amplitude_vec,...
+                                  GC_test_constant_vec,...
                                   ARM_NAME);
                               
-    % Test Controller
-    disp(sprintf('Testing GC controller of %s performance',ARM_NAME));
-    disp(sprintf('Calculating "error rate" between predicted and measuring torques',ARM_NAME));
-    pos_name_cell = fieldnames(config.GC_controller.GC_test);
-    test_pos_mat = [];
-    abs_err_mat_MTM = [];
-    rel_err_mat_MTM = [];
-    for k=1:size(pos_name_cell)
-        test_pos_mat = [test_pos_mat,getfield(config.GC_controller.GC_test,pos_name_cell{k})];
-        [abs_err, rel_err] = mtm_gc_controller.controller_test(deg2rad(test_pos_mat(:,end)));
-        abs_err_mat_MTM= [abs_err_mat_MTM,abs_err];
-        rel_err_mat_MTM = [rel_err_mat_MTM,rel_err];
-    end
-    GC_controllers.abs_err = abs_err;
-    GC_controllers.rel_err = rel_err;
-    disp(sprintf('===================='));
-    disp(sprintf('Test Result for %s', ARM_NAME));
-    for j=1:size(pos_name_cell)
-    disp(sprintf('For Pose_%d Joint_No: [''absolute error''], [''error rate%%'']',j));
-        for k = 1:7
-            disp(sprintf('Joint%d:[%.4f], [%d%%]',k, abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100)));
-        end
-    end
-    for j=1:size(pos_name_cell)
-        for k = 1:7
-            if(int32(rel_err_mat_MTM(k,j)*100)>=config.GC_controller.GC_test_error_rate_threshold)
-                warning(sprintf('[Test Pos %d]: --%s Joint%d-- absolute torque error:[%.4f], error rate:[%d%%], has exceed the error rate threshold %d%%',...
-                                                j,ARM_NAME,k,...
-                                                abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100),...
-                                                config.GC_controller.GC_test_error_rate_threshold));
-                                            
-                % Return a empty struct if the gravity compensation test fails
-                mtm_gc_controller = [];
-                return 
-            end
-        end
-    end
+
     
     % Move to gc controller start joint position and wait until MTM remains static
     mtm_gc_controller.mtm_arm.move_joint(deg2rad(config.GC_controller.GC_init_pos));

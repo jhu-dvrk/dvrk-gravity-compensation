@@ -16,7 +16,7 @@ classdef controller < handle
         g
         Zero_Output_Joint_No
         mtm_arm
-        amplitude_vec
+        GC_test_constant_vec
         msg_counter_buffer = 0
         is_disp_init_info = false
         ARM_NAME
@@ -32,7 +32,7 @@ classdef controller < handle
                                   beta_vel_amplitude,...
                                   g,...
                                   Zero_Output_Joint_No,...                           
-                                  amplitude_vec,...
+                                  GC_test_constant_vec,...
                                   ARM_NAME) 
                     obj.safe_upper_torque_limit = safe_upper_torque_limit;
                     obj.safe_lower_torque_limit = safe_lower_torque_limit;
@@ -40,7 +40,7 @@ classdef controller < handle
                     obj.g = g;
                     obj.Zero_Output_Joint_No = Zero_Output_Joint_No;
                     obj.mtm_arm = mtm_arm;
-                    obj.amplitude_vec = amplitude_vec;
+                    obj.GC_test_constant_vec = GC_test_constant_vec;
                     obj.ARM_NAME = ARM_NAME;
                     obj.dynamic_param_pos = dynamic_params_pos;
                     obj.dynamic_param_neg = dynamic_params_neg;
@@ -124,7 +124,8 @@ classdef controller < handle
             tau_measured = msg.Effort;
             tau_computed = obj.base_controller(q,q_dot);
             abs_err = abs(tau_measured-tau_computed);
-            rel_err = abs(abs_err./obj.amplitude_vec);
+            div_vec = abs(tau_measured)+obj.GC_test_constant_vec;
+            rel_err = abs(abs_err./div_vec);
         end
         
         % call this function to start the gc controller
