@@ -1,4 +1,4 @@
-function mtm_gc_controller = gc_program(ARM_NAME,SN)
+function mtm_gc_controller = estimate_gc_params(ARM_NAME,SN)
 %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
 %  Created on: 2018-10-05
 %  Copyright (c)  2018, The Chinese University of Hong Kong
@@ -7,8 +7,9 @@ function mtm_gc_controller = gc_program(ARM_NAME,SN)
     
     % argument input type checking
     arguement_checking(ARM_NAME,SN)
-    
-    disp(sprintf('The software has been developed with the support of BRME,CUHK.'));
+
+    disp(sprintf('This software is being developed by Biorobotics and Medical Technology Group of The Chinese University of Hong Kong (CUHK).'));
+    disp(sprintf('Author(s):  Hongbin LIN, Vincent Hui, Samuel Au'));
 
     output_file_str = wizard_config_dataCollection(ARM_NAME, SN);
     output_file_str = dataCollection(output_file_str);
