@@ -6,7 +6,7 @@ This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(
 * Multi-steps least square estimation
 * Low-Friction Zero-Gravity controller
 
-## Running Program
+## Usage
 -----
 ### 1. launch dVRK console
 
@@ -41,18 +41,18 @@ rosinit;
 
 Run the whole program in one command
 ```
-mtm_gc_controller = gc_program('<ARM-NAME>','<Serial-Number>')
+mtm_gc_controller = estimate_gc_params('<ARM-NAME>','<Serial-Number>')
 
 ```
 For example:
 ```
 % For MTML
-mtml_gc_controller = gc_program('MTML','12345')
+mtml_gc_controller = estimate_gc_params('MTML','12345')
 % For MTMR
-mtmr_gc_controller = gc_program('MTMR','54321')
+mtmr_gc_controller = estimate_gc_params('MTMR','54321')
 ```
 
-Then the program starts. It will go through process: 
+Then the program starts. It will go through 4 processes:
 
 **A) [wizard\_config\_dataCollection]**,
 
@@ -63,8 +63,8 @@ Then the program starts. It will go through process:
 **D) [gc_controller]**.
 
 -----
-### A) **[wizard\_config\_dataCollection]** (Manually, Need user input)
-In this process, user need to set the customized joint limits for further dataCollection process. Going through this process is extremely necessary because we don't want our MTMs hit the environments. For the reason that each MTM can be installed in different environment, we use this program to set some joints limits.
+### A) **[wizard\_config\_dataCollection]** (require user input)
+In this process, users need to set joint limits for the data collection process. Going through this process is necessary because we don't want our MTMs hit the environments. For the reason that each MTM can be installed in different environment, we need this process to set joints limits.
 
 After you step into this process, you will go through some instructions to set joint limits and then execute the collision checking. 
 
@@ -73,7 +73,7 @@ After you step into this process, you will go through some instructions to set j
 #### A) Step #1:
 MATLAB console:
 <p align="center">
- <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_1.png?token=ASrIorh7-N4opBUSKuab-Wz4mCehXyQQks5cDhdqwA%3D%3D" width="1000"  />
+ <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_1.png" width="1000"  />
 </p>
 
 The console will show some information of instructions， including instruction goal, MTM arm, Joint No which will be moved, the customized and current value and keyboard instruction. 
@@ -86,7 +86,7 @@ The console will show some information of instructions， including instruction 
 
 Set the joint limit when distal link of MTM is around 10cm away from top panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_1_real.png?token=ASrIotpndAu-qZ6UyQ_vogdFo3HS2ruTks5cDhd9wA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_1_real.png" width="500"  />
  </p>
  
 
@@ -94,12 +94,12 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 #### A) Step #2:
 MATLAB console:
 <p align="center">
- <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_2.png?token=ASrIokYcS1bZtwM5CyAi7RHt7Jswr6jGks5cDheUwA%3D%3D" width="1000"  />
+ <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_2.png" width="1000"  />
  </p>
 
 Set the joint limit when distal link of MTM is around 10cm away from front panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_2_real.png?token=ASrIopFx8cMTVktaWsePYzzgzlNoUMU1ks5cDhmUwA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_2_real.png" width="500"  />
  </p>
 
 
@@ -107,12 +107,12 @@ Set the joint limit when distal link of MTM is around 10cm away from front panel
 #### A) Step #3:
 MATLAB console:
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_3.png?token=ASrIoktfBCnfEPH640inE1-jdt1WsGeSks5cDhl-wA%3D%3D" width="1000"  />
+  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_3.png" width="1000"  />
  </p>
 
 Set the joint limit when distal link of MTM is around 10cm away from top panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_3_real.png?token=ASrIonVuXOktKhX_ZgD-kqdp2Sp56rxJks5cDhmTwA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_3_real.png" width="500"  />
  </p>
 
 
@@ -120,12 +120,12 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 #### A) Step #4:
 MATLAB console:
 <p align="center">
-   <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_4.png?token=ASrIoj8QHQE_mHH0mAbmgzOIRTQ_rZ-nks5cDhnpwA%3D%3D" width="1000"  />
+   <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_4.png" width="1000"  />
  </p>
 
 Set the joint limit when distal link of MTM is around 10cm away from top panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_3_real.png?token=ASrIonVuXOktKhX_ZgD-kqdp2Sp56rxJks5cDhmTwA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_3_real.png" width="500"  />
  </p>
 
 
@@ -133,12 +133,12 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 #### A) Step #5:
 MATLAB console:
 <p align="center">
- <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_5.png?token=ASrIovPD2GhvkdoHHB52zmzj0j3fXaJtks5cDhq5wA%3D%3D" width="1000"  />
+ <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_5.png"  />
  </p>
  
 Set the joint limit when distal link of MTM is around 10cm away from left panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_5_real.png?token=ASrIopk4PBKxTDoAf61E5L3QA4Fv8BoVks5cDhqBwA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_5_real.png" width="500"  />
  </p>
 
 
@@ -146,54 +146,56 @@ Set the joint limit when distal link of MTM is around 10cm away from left panel.
 #### A) Step #6:
 MATLAB console:
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_6.png?token=ASrIor51OQxTuR7X4bkhmTPQQAEsFq33ks5cDhrlwA%3D%3D" width="1000"  />
+  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_6.png" width="1000"  />
  </p>
  
 Set the joint limit when distal link of MTM is around 10cm away from right panel.
 <p align="center">
-<img src="https://raw.githubusercontent.com/wiki/CUHK-BRME/dvrk_Gravity_Compensation/images/wizard_6_real.png?token=ASrIopB1-CELTkOYA2TeFx73aCFbLjFUks5cDhr5wA%3D%3D" width="500"  />
+<img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_6_real.png" width="500"  />
  </p>
 
 Afterwards, it will execute **collision checking**. If you set the limit properly according to the previous instructions, MTM will not hit the environment. But if it unluckily hits the environment by mistakes, push E-button immediately.  
 
 **Collision checking** is making MTM to move according to preset trajectory which will be apply in dataCollection. Therefore, if collision checking passes, MTM in the dataCollection process will be free from collision.  
 
-### B) **[dataCollection]** (Automatic):
+### B) **[dataCollection]** (auto):
 In this process, dataCollection of MTM will be executed. This usually spend about 1hour. (No user input is required)
 
-### C) Process#3 **[mlse]** (Automatic):
-In this process, the dynamic parameters will be calculated by multi-steps least square estimation. (No user input is required)
+### C) Process#3 **[mlse]** (auto):
+In this process, the dynamic parameters will be estimated by multi-steps least square estimation. (No user input is required)
 
-### D) Process#4 **[gc_controller]** (Automatic):
+### D) Process#4 **[gc_controller]** (auto):
 In this process, gravity compensation controller will be applied by loading the dynamics parameters.(No user input is required)
 
+After 4 processes are finished, users is able to move MTM in Gravity-Compensation mode.
 
-After finishing all 4 processes, user is able to move MTM in Gravity-Compensation mode.
+## Loading GC configuration file in dVRK console
+After the thrid process is finished, a GC configuration file will be generated according to the serial number of the MTM if GC controller can perform well with the parameters estimated in Process#3.
 
-## Loading in dVRK console
-After you finish the first 3 process. the program will generate a file 
+<!--**../GC_Data_stable/<ARM_NAME>_<SN>/<date&time>/gc-<ARM-Name>-<SN>.json**-->
+For example: `../GC_Data_stable/MTML_41878/November-30-2018-10:57:53/gc-MTML-41878.json`.
 
-**..\GC_Data_stable\<ARM_NAME>_<SN>\<date&time>\gc-\<ARM-Name\>-\<SN\>.json**
- 
- (For example: ..\GC_Data_stable\MTML_41878\November-30-2018-10:57:53\gc-MTML-41878.json). 
-
-You can load the output file to Cpp version of gravity compensation of dVRK. Copy the file to "<path-to-dvrk-src>\cisst-saw\sawIntuitiveResearchKit\share". In the console JSON file, you need to edit the value of field name "gravity-compensation" :
+Copy the GC configuration file to `~/catkin_ws/src/cisst-saw/sawIntuitiveResearchKit/share/<your dVRK console configuration folder>`. In the console configuration file, add a field "gravity-compensation" in the specific MTM object:
 
 For example: 
 
-              gravity-compensation":"gc-MTML-12345.json"
-              
-Here is the template for [console json file](https://github.com/CUHK-BRME/dvrk_Gravity_Compensation/blob/V1.0/console-MTMR-MTML.json)
-
-
+```
+......
+        {
+            "name": "MTMR",
+            "type": "MTM",
+            "io": "sawRobotIO1394-MTMR-31519.xml",
+            "pid": "sawControllersPID-MTMR.xml",
+            "kinematic": "mtm.json",
+            "gravity-compensation": "gc-MTML-31519.json"
+        }
+......
+```
 
 ## Contact
+This software is being developed by Biorobotics and Medical Technology Group of The Chinese University of Hong Kong (CUHK).
 Feel free to contact us.  
 
 Hongbin LIN:  [hongbinlin@cuhk.edu.hk](hongbinlin@cuhk.edu.hk)
 
 Vincent Hui: [vincent.hui@cuhk.edu.hk](vincent.hui@cuhk.edu.hk) 
-
-## Acknowledgements
-The software has been developed with the support of BRME,CUHK.
-
