@@ -37,7 +37,6 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     % Add additional info in config struct and will save to output file
     config.ARM_NAME = ARM_NAME;
     config.SN = SN;
-    config.MTM_data_path = output_data_path_mtm;
     
     % Initiate the arm object and move to origin pose
     mtm_arm = mtm(ARM_NAME);
@@ -216,7 +215,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     end
 
 
-    % Execute collsion checking process
+    % Execute collision checking process
     collision_checking(config);
    
     % Save customized json output file for further data_collection process
@@ -343,9 +342,11 @@ function collision_checking(config)
     
     % General variables
     ARM_NAME = config.ARM_NAME;  
-    input_data_path = 'test';
-    is_path_planning = true;
+    is_collision_checking = true;
     is_collecting_data = false;
+    
+    % Vitual path for collision checking
+    input_data_path = 'test';
     
     % create mtm_arm obj and move every arm in home joint position
     mtm_arm = mtm(ARM_NAME);
@@ -353,12 +354,12 @@ function collision_checking(config)
     
     [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6]= setting_dataCollection(config,...
                                                                                                                     input_data_path);
-    collect_mtm_one_joint(config_joint6, mtm_arm, is_path_planning, is_collecting_data);
-    collect_mtm_one_joint(config_joint5, mtm_arm, is_path_planning, is_collecting_data);
-    collect_mtm_one_joint(config_joint4, mtm_arm, is_path_planning, is_collecting_data);
-    collect_mtm_one_joint(config_joint3, mtm_arm, is_path_planning, is_collecting_data);
-    collect_mtm_one_joint(config_joint2, mtm_arm, is_path_planning, is_collecting_data);
-    collect_mtm_one_joint(config_joint1, mtm_arm, is_path_planning, is_collecting_data);
+    collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data);
+    collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data);
+    collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data);
+    collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data);
+    collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data);
+    collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data);
     mtm_arm.move_joint([0,0,0,0,0,0,0]);   
 
 end
