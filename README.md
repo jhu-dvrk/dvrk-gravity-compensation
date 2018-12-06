@@ -76,7 +76,7 @@ MATLAB console:
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_1.png" width="1000"  />
 </p>
 
-The console will show some information of instructions， including instruction goal, MTM arm, Joint No which will be moved, the customized and current value and keyboard instruction. 
+The console will show some information of instructions including instruction goal, MTM arm, Joint No which will be moved, the customized and current value and keyboard instruction. 
 
 - To increase joint angle by 1 degree, type _i_ and return. 
 
@@ -167,13 +167,13 @@ In this process, the dynamic parameters will be estimated by multi-steps least s
 ### D) Process#4 **[gc_controller]** (auto):
 In this process, gravity compensation controller will be applied by loading the dynamics parameters.(No user input is required)
 
-After 4 processes are finished, users is able to move MTM in Gravity-Compensation mode.
+After 4 processes are finished, **users can move their MTM by hand to feel their MTM is being gravity-Compensated**.
 
 ## Loading GC configuration file in dVRK console
 After the thrid process is finished, a GC configuration file will be generated according to the serial number of the MTM if GC controller can perform well with the parameters estimated in Process#3.
 
 <!--**../GC_Data_stable/<ARM_NAME>_<SN>/<date&time>/gc-<ARM-Name>-<SN>.json**-->
-For example: `../GC_Data_stable/MTML_41878/November-30-2018-10:57:53/gc-MTML-41878.json`.
+For example: `<path-to-dvrk_Gravity_Compensation>/../GC_Data_stable/MTML_41878/November-30-2018-10:57:53/gc-MTML-41878.json` will be generated for MTML-41878.
 
 Copy the GC configuration file to `~/catkin_ws/src/cisst-saw/sawIntuitiveResearchKit/share/<your dVRK console configuration folder>`. In the console configuration file, add a field "gravity-compensation" in the specific MTM object:
 
