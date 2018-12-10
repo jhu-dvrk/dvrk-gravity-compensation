@@ -252,7 +252,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
             disp(sprintf('Arm: %s',ARM_NAME));
             disp(sprintf('Joint_No: %d',Joint_No));
             disp(sprintf('Customized Param Name: %s',param_name));           
-            disp(sprintf('Default Value: [%s] = %d degree ',param_name,default_value));
+            disp(sprintf('Recommended Value: [%s] = %d degree ',param_name,default_value));
             disp(sprintf('Current Value: [%s] = %d degree', param_name,customized_value));
             disp('Increase the value by 1 degree: [i]');
             disp('Decrease the value by 1 degree: [d]');
@@ -297,7 +297,7 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
             disp(sprintf('Arm: %s',ARM_NAME));
             disp(sprintf('Joint_No: %d',2));
             disp(sprintf('Customized Param Name: %s',param_name));           
-            disp(sprintf('Recommend Value: [%s] = %d degree ',param_name,default_value));
+            disp(sprintf('Recommended Value: [%s] = %d degree ',param_name,default_value));
             disp(sprintf('Current Value: [%s] = %d degree', param_name,customized_value));
             disp('Increase the value by 1 degree: [i]');
             disp('Decrease the value by 1 degree: [d]');
