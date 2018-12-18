@@ -1,9 +1,9 @@
 function bool_Regressor_Mat = analytical_bool_regressor_mat()
-%  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
-%  Created on: 2018-10-05
-%  Copyright (c)  2018, The Chinese University of Hong Kong
-%  This software is provided "as is" under BSD License, with
-%  no warranty. The complete license can be found in LICENSE
+    %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
+    %  Created on: 2018-10-05
+    %  Copyright (c)  2018, The Chinese University of Hong Kong
+    %  This software is provided "as is" under BSD License, with
+    %  no warranty. The complete license can be found in LICENSE
 
     % bool_Regressor_Mat, if Regressor(i,j)~=Null, bool_Regressor_Mat=1; else bool_Regressor_Mat=0;
     % Hard code, computed by simbolic derivation
