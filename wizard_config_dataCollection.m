@@ -69,7 +69,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     param_name = 'theta_angle_max';
     default_value = config.data_collection.joint3.theta_angle_max;
     joint_init_pos(2) = default_value-5; %10 degree smaller for saftey reason
-    joint_init_pos(3) = config.data_collection.joint3.couple_lower_limit-joint_init_pos(2)
+    joint_init_pos(3) = config.data_collection.joint3.couple_lower_limit-joint_init_pos(2);
     couple_contraint =  config.data_collection.joint3.couple_lower_limit;
     goal_msg = 'Moving MTM forward, finish when distal links of MTM 10cm away from front panel of environment';
     config.data_collection.joint3.theta_angle_max = wizard_move_two_joint(mtm_arm,...
@@ -92,7 +92,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     joint_init_pos(3) = config.data_collection.joint3.couple_upper_limit - 10 - joint_init_pos(2);
     param_name = 'couple_upper_limit';
     default_value = config.data_collection.joint3.couple_upper_limit;
-    goal_msg = 'Moving MTM upward by increasing Joint#3, finish when distal links of MTM 10cm away from top panel of environment';;
+    goal_msg = 'Moving MTM upward by increasing Joint#3, finish when distal links of MTM 10cm away from top panel of environment';
     config.data_collection.joint3.couple_upper_limit = wizard_move_one_joint(mtm_arm,...
         joint_init_pos,...
         Joint_No,...
@@ -125,7 +125,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
         Joint_No = 1;
         param_name = 'train_angle_min';
         default_value = config.data_collection.joint1.train_angle_min.MTML;
-        goal_msg = 'Moving MTM left by decreasing Joint#1, finish when distal links of MTM 10cm away from left panel of environment';;
+        goal_msg = 'Moving MTM left by decreasing Joint#1, finish when distal links of MTM 10cm away from left panel of environment';
         config.data_collection.joint1.train_angle_min.MTML = wizard_move_one_joint(mtm_arm,...
             joint_init_pos,...
             Joint_No,...
@@ -194,17 +194,18 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     end
 
     % Final result output display
+    close(gcf);
     clc
-    disp(sprintf('Your customized parameters is:'));
-    disp(sprintf('joint3.theta_angle_max: %d', config.data_collection.joint3.theta_angle_max));
-    disp(sprintf('joint3.couple_upper_limit: %d', config.data_collection.joint3.couple_upper_limit));
+    fprintf('Your customized parameters is:\n');
+    fprintf('joint3.theta_angle_max: %d\n', config.data_collection.joint3.theta_angle_max);
+    fprintf('joint3.couple_upper_limit: %d\n', config.data_collection.joint3.couple_upper_limit);
     if strcmp(ARM_NAME,'MTML')
-        disp(sprintf('Joint1.train_angle_min.MTML: %d', config.data_collection.joint1.train_angle_min.MTML));
-        disp(sprintf('Joint1.train_angle_max.MTML: %d', config.data_collection.joint1.train_angle_max.MTML));
+        fprintf('Joint1.train_angle_min.MTML: %d\n', config.data_collection.joint1.train_angle_min.MTML);
+        fprintf('Joint1.train_angle_max.MTML: %d\n', config.data_collection.joint1.train_angle_max.MTML);
     end
     if strcmp(ARM_NAME,'MTMR')
-        disp(sprintf('Joint1.train_angle_min.MTMR: %d', config.data_collection.joint1.train_angle_min.MTMR));
-        disp(sprintf('Joint1.train_angle_max.MTMR: %d', config.data_collection.joint1.train_angle_max.MTMR));
+        fprintf('Joint1.train_angle_min.MTMR: %d\n', config.data_collection.joint1.train_angle_min.MTMR);
+        fprintf('Joint1.train_angle_max.MTMR: %d\n', config.data_collection.joint1.train_angle_max.MTMR);
     end
 
 
@@ -212,12 +213,12 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     collision_checking(config);
 
     % Save customized json output file for further data_collection process
-    output_file_str = [output_data_path_mtm,'/dataCollection_config_customized.json'];
+    output_file_str = [output_data_path_mtm, '/dataCollection_config_customized.json'];
     fid = fopen(output_file_str,'w');
     jsonStr = jsonencode(config);
     fwrite(fid, jsonStr);
     fclose(fid);
-    disp(sprintf('Save config file to %s', output_file_str));
+    fprintf('Save config file to %s\n', output_file_str);
 end
 
 function customized_value = wizard_move_one_joint(mtm_arm,...
@@ -229,27 +230,31 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
         goal_msg,...
         is_couple_limit)
     input_str = '';
-    disp(sprintf('Setting Hard limit for when collecting data of Joint#%d ',Joint_No))
-    disp(sprintf('Moving to init pose'));
+    fprintf('Setting Hard limit for when collecting data of Joint#%d\n', Joint_No)
+    fprintf('Moving to init pose\n');
     mtm_arm.move_joint(deg2rad(joint_init_pos));
-    if(~exist('is_couple_limit'))
+    if(~exist('is_couple_limit', 'var'))
         customized_value = joint_init_pos(Joint_No);
     else
         customized_value = joint_init_pos(Joint_No) + joint_init_pos(Joint_No-1);
     end
     joint_pos = joint_init_pos;
-    while(true)
-        while(~strcmp(input_str,'i') & ~strcmp(input_str,'d') & ~strcmp(input_str,'f'))
+    while (true)
+        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
             clc
-            disp(sprintf('Instruction: %s', goal_msg));
-            disp(sprintf('Arm: %s',ARM_NAME));
-            disp(sprintf('Joint_No: %d',Joint_No));
-            disp(sprintf('Customized Param Name: %s',param_name));
-            disp(sprintf('Recommended Value: [%s] = %d degree ',param_name,default_value));
-            disp(sprintf('Current Value: [%s] = %d degree', param_name,customized_value));
+            fprintf('Instruction: %s\n', goal_msg);
+            fprintf('Arm: %s\n', ARM_NAME);
+            fprintf('Joint_No: %d\n', Joint_No);
+            fprintf('Customized Param Name: %s\n', param_name);
+            fprintf('Recommended Value: [%s] = %d degree\n', param_name, default_value);
+            fprintf('Current Value: [%s] = %d degree\n', param_name, customized_value);
             disp('Increase the value by 1 degree: [i]');
             disp('Decrease the value by 1 degree: [d]');
-            input_str = input(sprintf('Finish the process: [f]:'),'s');
+            disp('Finish the process: [f]:');
+            w = waitforbuttonpress;
+            if w
+                input_str = get(gcf, 'CurrentCharacter');
+            end
         end
         if(input_str == 'i')
             customized_value = customized_value+1;
@@ -258,7 +263,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
         else
             break
         end
-        if(~exist('is_couple_limit'))
+        if(~exist('is_couple_limit', 'var'))
             joint_pos(Joint_No) = customized_value;
         else
             joint_pos(Joint_No) = customized_value - joint_pos(Joint_No-1);
@@ -278,23 +283,27 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
     % Hard Code
     Joint3_pos_min_limit = -35;
     input_str = '';
-    disp(sprintf('Setting Hard limit for when collecting data of Joint#%d ',3))
-    disp(sprintf('Moving to init pose'));
+    fprintf('Setting Hard limit for when collecting data of Joint#%d\n', 3);
+    disp('Moving to init pose');
     mtm_arm.move_joint(deg2rad(joint_init_pos));
     customized_value = joint_init_pos(2);
     joint_pos = joint_init_pos;
-    while(true)
-        while(~strcmp(input_str,'i') & ~strcmp(input_str,'d') & ~strcmp(input_str,'f'))
+    while (true)
+        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
             clc
-            disp(sprintf('Instruction: %s', goal_msg));
-            disp(sprintf('Arm: %s',ARM_NAME));
-            disp(sprintf('Joint_No: %d',2));
-            disp(sprintf('Customized Param Name: %s',param_name));
-            disp(sprintf('Recommended Value: [%s] = %d degree ',param_name,default_value));
-            disp(sprintf('Current Value: [%s] = %d degree', param_name,customized_value));
+            fprintf('Instruction: %s\n', goal_msg);
+            fprintf('Arm: %s\n', ARM_NAME);
+            fprintf('Joint_No: %d\n', 2);
+            fprintf('Customized Param Name: %s\n', param_name);
+            fprintf('Recommended Value: [%s] = %d degree\n', param_name,default_value);
+            fprintf('Current Value: [%s] = %d degree\n', param_name, customized_value);
             disp('Increase the value by 1 degree: [i]');
             disp('Decrease the value by 1 degree: [d]');
-            input_str = input(sprintf('Finish the process: [f]:'),'s');
+            disp('Finish the process: [f]:');
+            w = waitforbuttonpress;
+            if w
+                input_str = get(gcf, 'CurrentCharacter');
+            end
         end
         if(input_str == 'i')
             customized_value = customized_value+1;
@@ -317,12 +326,12 @@ end
 
 function argument_checking(ARM_NAME,...
         SN)
-    if~strcmp(ARM_NAME,'MTML') & ~strcmp(ARM_NAME,'MTMR')
-        error(sprintf(['Input of argument ''ARM_NAME''= %s is error, you should input one of the string',...
-            '[''MTML'',''MTMR'']'],ARM_NAME));
+    if~strcmp(ARM_NAME,'MTML') && ~strcmp(ARM_NAME,'MTMR')
+        error(['Input of argument ''ARM_NAME''= %s is error, you should input one of the string',...
+            '[''MTML'',''MTMR'']'],ARM_NAME);
     end
     if ~ischar(SN)
-        error(sprintf('SN input %s is not char arrary', SN))
+        error('SN input %s is not char arrary', SN);
     end
 end
 

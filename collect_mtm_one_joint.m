@@ -9,7 +9,7 @@ function data_file_struct = collect_mtm_one_joint(config,...
     %  no warranty. The complete license can be found in LICENSE
 
     % Collect Torque data by positive direction
-    if config.is_pos_dir & ~is_collision_checking
+    if config.is_pos_dir && ~is_collision_checking
         data_file_list = collect_mtm_one_joint_with_one_dir(config,...
             mtm_arm,...
             config.pos_joint_range_list,...
@@ -19,7 +19,7 @@ function data_file_struct = collect_mtm_one_joint(config,...
             'positive');
         data_file_struct.pos = data_file_list;
     end
-    if config.is_neg_dir & ~is_collision_checking
+    if config.is_neg_dir && ~is_collision_checking
         data_file_list = collect_mtm_one_joint_with_one_dir(config,...
             mtm_arm,...
             config.neg_joint_range_list,...
@@ -60,8 +60,8 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
     data_file_list = {};
 
     if is_collision_checking
-        disp(sprintf('Checking trajectory collision for joint#%d by %s direction now..', config.Train_Joint_No,dir_name));
-        disp(sprintf('If MTM hit the environment, please hit E-Button to stop instantly!'));
+        fprintf('Checking trajectory collision for joint %d in %s direction now..\n', config.Train_Joint_No,dir_name);
+        disp('If the MTM hits the environment, please hit E-Button to stop instantly!');
     end
     for  k = 1:size(joint_range_list,2)
         if config.Train_Joint_No ==1
@@ -71,7 +71,7 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
             Theta = int32(rad2deg(Theta));
         end
         joint_range = joint_range_list{k};
-        [joint_trajectory,jranges_ranges] = generate_joint_grid(joint_range);
+        [joint_trajectory, jranges_ranges] = generate_joint_grid(joint_range);
         sample_size = size(joint_trajectory,2);
         desired_effort = zeros(7,sample_size, sample_num);
         current_position = zeros(7,sample_size,sample_num);
@@ -85,19 +85,21 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
             end
         end
         if is_collecting_data
-            disp(sprintf('Start to collect Torque data of Theta Joint, Joint%d, with angle %d by %s direction',config.Theta_Joint_No,...
+            fprintf('Collecting torque data of Theta joint %d, with angle %d in %s direction\n',config.Theta_Joint_No,...
                 Theta,...
-                dir_name));
-
+                dir_name);
+            lastsize = 0; % to erase last printed line
             for i=1:sample_size
                 mtm_arm.move_joint(joint_trajectory(:,i));
                 pause(steady_time);
                 for j=1:sample_num
-                    [position, velocity, desired_effort(:,i,j)] = mtm_arm.get_state_joint_desired();
-                    [current_position(:,i,j), velocity, effort] = mtm_arm.get_state_joint_current();
+                    [~, ~, desired_effort(:,i,j)] = mtm_arm.get_state_joint_desired();
+                    [current_position(:,i,j), ~, ~] = mtm_arm.get_state_joint_current();
                 end
-                disp(sprintf('Moving Train Joint, Joint%d, to angle %d',config.Train_Joint_No, int32(rad2deg(joint_trajectory(config.Train_Joint_No,i)))));
+                fprintf(repmat('\b', 1, lastsize));
+                lastsize = fprintf('Moving joint %d to angle %d', config.Train_Joint_No, int32(rad2deg(joint_trajectory(config.Train_Joint_No, i))));
             end
+            fprintf(repmat('\b', 1, lastsize)); % clear last printed line
             if exist(data_save_path)~=7
                 mkdir(data_save_path)
             end

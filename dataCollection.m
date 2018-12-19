@@ -48,7 +48,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
 
     % dataCollection
     is_collision_checking = false;
-    is_collecting_data = true
+    is_collecting_data = true;
     output_data_struct.joint6 = collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data);
     output_data_struct.joint5 = collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data);
     output_data_struct.joint4 = collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data);
