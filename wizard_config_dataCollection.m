@@ -354,12 +354,19 @@ function collision_checking(config)
 
     [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6]= setting_dataCollection(config,...
         input_data_path);
-    collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data);
-    collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data);
-    collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data);
-    collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data);
-    collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data);
-    collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data);
+    progress_increment = 100.0 / 6.0; % 6 steps
+    progress = 0.0;
+    collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 
 end

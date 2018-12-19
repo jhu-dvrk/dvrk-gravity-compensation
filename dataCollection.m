@@ -9,10 +9,10 @@ function output_file_str = dataCollection(dataCollection_config_str)
     argument_checking(dataCollection_config_str);
 
     % Read JSON Config File
-    disp(sprintf('Loading JSON File %s', dataCollection_config_str));
+    fprintf('Loading JSON File %s\n', dataCollection_config_str);
     fid = fopen(dataCollection_config_str);
     if fid<3
-        error('Cannot read file %s',dataCollection_config_str)
+        error('Cannot read file %s', dataCollection_config_str)
     end
     raw = fread(fid, inf);
     str = char(raw');
@@ -22,7 +22,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
 
     % Create unique date folder to store the collecting data
     date_time = datestr(datetime('now'),'mmmm-dd-yyyy-HH:MM:SS');
-    [MTM_data_path,name,ext] = fileparts(dataCollection_config_str);
+    [MTM_data_path,~,~] = fileparts(dataCollection_config_str);
     input_data_path_with_date = [MTM_data_path,'/',date_time];
     mkdir(input_data_path_with_date);
 
@@ -35,9 +35,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
     jsonStr = jsonencode(config);
     fwrite(fid, jsonStr);
     fclose(fid);
-    disp(sprintf('Save config file to %s', output_file_str));
-
-
+    fprintf('Save config file to %s\n', output_file_str);
 
     % Create mtm_arm obj and move every arm in home position for safety reason
     mtm_arm = mtm(ARM_NAME);
@@ -49,12 +47,19 @@ function output_file_str = dataCollection(dataCollection_config_str)
     % dataCollection
     is_collision_checking = false;
     is_collecting_data = true;
-    output_data_struct.joint6 = collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data);
-    output_data_struct.joint5 = collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data);
-    output_data_struct.joint4 = collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data);
-    output_data_struct.joint3 = collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data);
-    output_data_struct.joint2 = collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data);
-    output_data_struct.joint1 = collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data);
+    progress_increment = 100.0 / 6.0; % 6 steps
+    progress = 0.0;
+    output_data_struct.joint6 = collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    output_data_struct.joint5 = collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    output_data_struct.joint4 = collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    output_data_struct.joint3 = collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    output_data_struct.joint2 = collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
+    progress = progress + progress_increment;
+    output_data_struct.joint1 = collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 end
 

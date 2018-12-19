@@ -15,7 +15,7 @@ function mtm_gc_controller = gc_controller(gc_controller_cofig_json)
     % Reading config file "gc_controller_cofig_json"
     fid = fopen(gc_controller_cofig_json);
     if fid<3
-        error(sprintf('Cannot find file %s',gc_controller_cofig_json))
+        error('Cannot find file %s',gc_controller_cofig_json)
     end
     raw = fread(fid, inf);
     str = char(raw');
@@ -23,7 +23,7 @@ function mtm_gc_controller = gc_controller(gc_controller_cofig_json)
     config = jsondecode(str);
 
     % Version Checking
-    if config.version ~= '1.0';
+    if config.version ~= '1.0'
         error('The version of dvrk gravity compensation should be 1.0')
     end
 
@@ -72,8 +72,8 @@ function argument_checking(gc_controller_cofig_json)
         error('Input argument "gc_controller_cofig_json" should be a char arrary')
     end
     if ~(strcmp(gc_controller_cofig_json(end-4:end),'.json'))
-        error(sprintf(['Input of argument ''gc_controller_cofig_json''= %s',...
-            ' is error, you should input file with .json extend format '],gc_controller_cofig_json));
+        sprintf(['Input of argument ''gc_controller_cofig_json''= %s',...
+            ' is error, you should input file with .json extend format '],gc_controller_cofig_json);
     end
 end
 

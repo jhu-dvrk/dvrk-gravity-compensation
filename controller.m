@@ -46,7 +46,7 @@ classdef controller < handle
             obj.dynamic_param_neg = dynamic_params_neg;
             disp('Controller dynamic parameters of MTM: [param]');
             for i=1:size(obj.dynamic_param_pos,1)
-                disp(sprintf('Param_%d: [%0.5f], [%0.5f] ', i, obj.dynamic_param_pos(i), obj.dynamic_param_neg(i)));
+                fprintf('Param_%d: [%0.5f], [%0.5f]\n', i, obj.dynamic_param_pos(i), obj.dynamic_param_neg(i));
             end
             obj.pub_tor = rospublisher(['/dvrk/',ARM_NAME,'/set_effort_joint']);
             obj.sub_pos = rossubscriber(['/dvrk/',ARM_NAME,'/state_joint_current']);
@@ -55,15 +55,15 @@ classdef controller < handle
         % Callback function of pose subscriber when start gc controller
         function callback_gc_publisher(obj, q, q_dot)
             if(~obj.is_disp_init_info)
-                disp(sprintf('GC of %s starts, you can move %s now. If you need to stop gc controller, call "mtm_gc_controller.stop_gc".',obj.ARM_NAME,obj.ARM_NAME));
+                fprintf('GC of %s starts, you can move %s now. If you need to stop gc controller, call "mtm_gc_controller.stop_gc()".\n',obj.ARM_NAME,obj.ARM_NAME);
                 obj.is_disp_init_info = true;
             end
 
             if(obj.msg_counter_buffer==0)
-                disp(sprintf('running..'));
+                fprintf('.');
             end
 
-            if(obj.msg_counter_buffer == 1000)
+            if(obj.msg_counter_buffer == 100)
                 obj.msg_counter_buffer = 0;
             else
                 obj.msg_counter_buffer = obj.msg_counter_buffer+1;
@@ -140,6 +140,7 @@ classdef controller < handle
         function stop_gc(obj)
             obj.sub_pos = rossubscriber(['/dvrk/',obj.ARM_NAME,'/state_joint_current']);
             obj.mtm_arm.move_joint([0,0,0,0,0,0,0]);
+            disp('gc_controller stopped');
         end
     end
 
