@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Overview](#overview)
+- [Usage](#usage)
+  - [1. launch dVRK console](#1-launch-dvrk-console)
+  - [2.Initialize MATLAB](#2initialize-matlab)
+  - [3. Runing MATLAB Script Program](#3-runing-matlab-script-program)
+  - [A) **[wizard\_config\_dataCollection]** (require user input)](#a-wizard%5C_config%5C_datacollection-require-user-input)
+    - [A) Step #1:](#a-step-1)
+    - [A) Step #2:](#a-step-2)
+    - [A) Step #3:](#a-step-3)
+    - [A) Step #4:](#a-step-4)
+    - [A) Step #5:](#a-step-5)
+    - [A) Step #6:](#a-step-6)
+  - [B) **[dataCollection]** (auto):](#b-datacollection-auto)
+  - [C) Process#3 **[mlse]** (auto):](#c-process3-mlse-auto)
+  - [D) Process#4 **[gc_controller]** (auto):](#d-process4-gc_controller-auto)
+- [Loading the gravity compensation configuration file in dVRK console](#loading-the-gravity-compensation-configuration-file-in-dvrk-console)
+- [Contact](#contact)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Overview
 This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(GC) of Master Tool Manipulator(MTM) for dVRK. Compared to former work, our repository solves following problems:
 
