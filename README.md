@@ -36,7 +36,7 @@ This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(
 ## 1. launch dVRK console
 
 **Notes:**
-* You will need Matlab with the Robotic Toolkit.  Matlab can be installed on the same computer as the dVRK controller (simpler) or on a different computer since the gravity compensation data collection used ROS to communicate with the dVRK controller.
+* You will need Matlab with the Robotic Toolkit to use ROS.  Version 2018b is known to work.  Matlab can be installed on the same computer as the dVRK controller (simpler) or on a different computer since the gravity compensation data collection used ROS to communicate with the dVRK controller.
 * If you happen to have a full da Vinci master console, please power it and raise the stereo display as high as you can (using the two round buttons on the left side of the arm rest).  This will provide more space to move around the MTMs and identify the gravity compensation parameters.
 * If you have two MTMs, you will need to repeat the procedure for each arm.  While collecting data for one arm, try to keep the other arm all the way to the side.  This is to provide as much space as possible while avoiding collisions.
 
