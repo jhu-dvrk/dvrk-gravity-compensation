@@ -360,6 +360,7 @@ function collision_checking(config)
         input_data_path);
     progress_increment = 100.0 / 6.0; % 6 steps
     progress = 0.0;
+    tic;
     collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
     progress = progress + progress_increment;
     collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
