@@ -64,13 +64,13 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
 
-    arm_name = config.arm_name;
     sample_num = config.sample_num;
     steady_time = config.steady_time;
     data_file_list = {};
 
     if is_collision_checking
-        fprintf('Checking trajectory collision for joint %d in %s direction now..\n', config.Train_Joint_No,dir_name);
+        fprintf('Checking trajectory collision for joint %d in %s direction now..\n',...
+            config.Train_Joint_No, dir_name);
         disp('If the MTM hits the environment, please hit E-Button to stop instantly!');
     end
 
@@ -98,11 +98,12 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
             end
         end
         if is_collecting_data
-            fprintf('Collecting torque data with Theta joint %d at angle %d, moving joint %d in %s direction\n',...
+            fprintf('Collecting torque data with Theta joint %d at angle %d, moving joint %d in %s direction (%5.2f%%)\n',...
                 config.Theta_Joint_No,...
                 Theta,...
                 config.Train_Joint_No,...
-                dir_name);
+                dir_name,...
+                progress_2);
             lastsize = 0; % to erase last printed line
             progress_increment_3 = progress_increment_2 / sample_size;
             progress_3 = progress_2;
@@ -110,6 +111,7 @@ function data_file_list = collect_mtm_one_joint_with_one_dir(config,...
                 mtm_arm.move_joint(joint_trajectory(:,i));
                 pause(steady_time);
                 for j=1:sample_num
+                    pause(0.01); % pause 10ms assuming dVRK console publishes at about 100Hz so we get different samples
                     [~, ~, desired_effort(:,i,j)] = mtm_arm.get_state_joint_desired();
                     [current_position(:,i,j), ~, ~] = mtm_arm.get_state_joint_current();
                 end
