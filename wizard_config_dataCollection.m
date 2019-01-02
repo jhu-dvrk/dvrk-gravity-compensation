@@ -195,7 +195,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
 
     % Final result output display
     close(gcf);
-    clc
+
     fprintf('Your customized parameters is:\n');
     fprintf('joint3.theta_angle_max: %d\n', config.data_collection.joint3.theta_angle_max);
     fprintf('joint3.couple_upper_limit: %d\n', config.data_collection.joint3.couple_upper_limit);
@@ -239,18 +239,19 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
         customized_value = joint_init_pos(Joint_No) + joint_init_pos(Joint_No-1);
     end
     joint_pos = joint_init_pos;
+    fprintf('Instruction: %s\n', goal_msg);
+    fprintf('Arm: %s\n', ARM_NAME);
+    fprintf('Joint_No: %d\n', Joint_No);
+    fprintf('Customized Param Name: %s\n', param_name);
+    disp('Increase the value by 1 degree: [i]');
+    disp('Decrease the value by 1 degree: [d]');
+    disp('Finish the process: [f]:');
+    fprintf('Recommended value: [%s] = %d degree(s)\n', param_name, default_value);
+    lastsize = 0;
     while (true)
         while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
-            clc
-            fprintf('Instruction: %s\n', goal_msg);
-            fprintf('Arm: %s\n', ARM_NAME);
-            fprintf('Joint_No: %d\n', Joint_No);
-            fprintf('Customized Param Name: %s\n', param_name);
-            fprintf('Recommended Value: [%s] = %d degree\n', param_name, default_value);
-            fprintf('Current Value: [%s] = %d degree\n', param_name, customized_value);
-            disp('Increase the value by 1 degree: [i]');
-            disp('Decrease the value by 1 degree: [d]');
-            disp('Finish the process: [f]:');
+            fprintf(repmat('\b', 1, lastsize));
+            lastsize = fprintf('Current value: [%s] = %d degree(s)', param_name, customized_value);
             w = waitforbuttonpress;
             if w
                 input_str = get(gcf, 'CurrentCharacter');
@@ -261,6 +262,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
         elseif(input_str == 'd')
             customized_value = customized_value-1;
         else
+            fprintf(repmat('\b', 1, lastsize)); % clear last printed line
             break
         end
         if(~exist('is_couple_limit', 'var'))
@@ -288,18 +290,19 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
     mtm_arm.move_joint(deg2rad(joint_init_pos));
     customized_value = joint_init_pos(2);
     joint_pos = joint_init_pos;
+    fprintf('Instruction: %s\n', goal_msg);
+    fprintf('Arm: %s\n', ARM_NAME);
+    fprintf('Joint_No: %d\n', 2);
+    fprintf('Customized Param Name: %s\n', param_name);
+    disp('Increase the value by 1 degree: [i]');
+    disp('Decrease the value by 1 degree: [d]');
+    disp('Finish the process: [f]:');
+    fprintf('Recommended value: [%s] = %d degree(s)\n', param_name,default_value);
+    lastsize = 0;
     while (true)
         while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
-            clc
-            fprintf('Instruction: %s\n', goal_msg);
-            fprintf('Arm: %s\n', ARM_NAME);
-            fprintf('Joint_No: %d\n', 2);
-            fprintf('Customized Param Name: %s\n', param_name);
-            fprintf('Recommended Value: [%s] = %d degree\n', param_name,default_value);
-            fprintf('Current Value: [%s] = %d degree\n', param_name, customized_value);
-            disp('Increase the value by 1 degree: [i]');
-            disp('Decrease the value by 1 degree: [d]');
-            disp('Finish the process: [f]:');
+            fprintf(repmat('\b', 1, lastsize));
+            lastsize = fprintf('Current value: [%s] = %d degree(s)', param_name, customized_value);
             w = waitforbuttonpress;
             if w
                 input_str = get(gcf, 'CurrentCharacter');
@@ -310,6 +313,7 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
         elseif(input_str == 'd')
             customized_value = customized_value-1;
         else
+            fprintf(repmat('\b', 1, lastsize)); % clear last printed line
             break
         end
         joint_pos(2) = customized_value;
