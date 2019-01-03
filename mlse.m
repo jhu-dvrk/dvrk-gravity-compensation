@@ -13,7 +13,7 @@ function output_file_str = mlse(dataCollection_info_str)
     % Read JSON config input file dataCollection_info_str
     fid = fopen(dataCollection_info_str);
     if fid<3
-        error('Cannot read file %s',dataCollection_info_str)
+        error('Cannot read file %s', dataCollection_info_str)
     end
     raw = fread(fid, inf);
     str = char(raw');
@@ -21,11 +21,11 @@ function output_file_str = mlse(dataCollection_info_str)
     config = jsondecode(str);
 
     % Get the path
-    [input_data_path_with_date,name,ext] = fileparts(dataCollection_info_str);
+    [input_data_path_with_date, ~, ~] = fileparts(dataCollection_info_str);
 
     % display data input root path
     disp(' ');
-    disp(sprintf('data path for MLSE : ''%s'' ',input_data_path_with_date));
+    fprintf('data path for MLSE : ''%s'' \n', input_data_path_with_date);
     disp(' ');
 
     % read JSON config file "mlse_config.json"
@@ -88,7 +88,7 @@ end
 
 function argument_checking(input_data_path_with_date)
     if ischar(input_data_path_with_date) ==0
-        error(sprintf('%s is not a char object',input_data_path_with_date))
+        error('%s is not a char object', input_data_path_with_date)
     end
 end
 
@@ -96,16 +96,12 @@ function dynamic_param = lse_mtm_one_joint(config_lse_joint, previous_config)
     %  Institute: The Chinese University of Hong Kong
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
+    
+    fprintf('LSE for joint %d started..\n', config_lse_joint.Joint_No);
 
     if ~exist('previous_config')
-        disp(sprintf('LSE of Joint%d  has start..',config_lse_joint.Joint_No));
-
         dynamic_param = lse_model(config_lse_joint);
-
-
     else
-        disp(sprintf('LSE of Joint%d has start..',config_lse_joint.Joint_No));
-
         % if there is 'previous_config', we pass the path to the result of previous step of LSE to lse_model
         dynamic_param = lse_model(config_lse_joint,...
             previous_config.output_param_path);
@@ -188,7 +184,7 @@ function dynamic_parameters_vec = lse_model(config_lse_joint1,...
     disp(' ');
 
     % Plot the fitting figures using trained parameters
-    if lse_obj.Is_Plot~=0 | lse_obj.issave_figure~=0
+    if lse_obj.Is_Plot~=0 || lse_obj.issave_figure~=0
         plot_fitting_curves(lse_obj,'pos',dynamic_parameters_vec);
         plot_fitting_curves(lse_obj,'neg',dynamic_parameters_vec);
     end
@@ -227,10 +223,10 @@ function lse_obj = lse_preparation(config_lse_joint)
 
     % check the given joint path exist
     if exist(lse_obj.Input_Pos_Data_Path)==0
-        error(sprintf('Cannot find input data folder: %s, Please check if input data folder exist. ',lse_obj.Input_Pos_Data_Path));
+        error('Cannot find input data folder: %s. Please check that input data folder exists.', lse_obj.Input_Pos_Data_Path);
     end
     if exist(lse_obj.Input_Neg_Data_Path)==0
-        error(sprintf('Cannot find input data folder: %s, Please check if input data folder exist. ',lse_obj.Input_Neg_Data_Path));
+        error('Cannot find input data folder: %s. Please check that input data folder exists.', lse_obj.Input_Neg_Data_Path);
     end
 
     data_path_struct_list = dir(lse_obj.input_pos_data_files);
@@ -320,14 +316,14 @@ function Torques_data = torques_data_process(current_position, desired_effort, m
                     end
                 end
             end
-            if(strcmp(lower(method),'mean'))
+            if(strcmpi(method,'mean'))
                 Torques_data(j,1,i) = position_data_filtered_mean;
                 Torques_data(j,2,i) = effort_data_filtered_mean;
-            elseif(strcmp(lower(method),'min_abs_error'))
+            elseif(strcmpi(method,'min_abs_error'))
                 Torques_data(j,1,i) = current_position(j,i,final_index);
                 Torques_data(j,2,i) = desired_effort(j,i,final_index);
             else
-                Error('Method argument is wrong, please pass: mean or min_abs_error.')
+                error('Method argument is wrong, please pass: mean or min_abs_error.')
             end
         end
     end
@@ -425,7 +421,7 @@ function plot_fit_joint(Torques_data,...
             mkdir(save_path)
         end
         saveas(gcf, strcat(save_path,'/Figure_',int2str(save_file_index),'_',title_string,'.png'));
-        disp(sprintf(strcat('Figure, [',title_string,'.png], has saved.')));
+        fprintf(strcat('Figure, [',title_string,'.png] saved.\n'));
     end
 end
 
@@ -462,8 +458,8 @@ function is_test_success =  gravity_compensation_test(config)
         ARM_NAME);
 
     % Test Controller
-    disp(sprintf('Testing GC controller of %s performance',ARM_NAME));
-    disp(sprintf('Calculating "error rate" between predicted and measuring torques',ARM_NAME));
+    fprintf('Testing GC controller for %s\n', ARM_NAME);
+    fprintf('Calculating "error rate" between predicted and measured torques\n');
     pos_name_cell = fieldnames(config.GC_controller.GC_test);
     test_pos_mat = [];
     abs_err_mat_MTM = [];
@@ -476,21 +472,21 @@ function is_test_success =  gravity_compensation_test(config)
     end
     GC_controllers.abs_err = abs_err;
     GC_controllers.rel_err = rel_err;
-    disp(sprintf('===================='));
-    disp(sprintf('Test Result for %s', ARM_NAME));
+    fprintf('====================\n');
+    fprintf('Test Result for %s\n', ARM_NAME);
     for j=1:size(pos_name_cell)
-        disp(sprintf('For Pose_%d Joint_No: [''absolute error''], [''error rate%%'']',j));
+        fprintf('For Pose_%d Joint_No: [''absolute error''], [''error rate%%'']\n', j);
         for k = 1:7
-            disp(sprintf('Joint%d:[%.4f], [%d%%]',k, abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100)));
+            fprintf('Joint%d:[%.4f], [%d%%]\n', k , abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100));
         end
     end
     for j=1:size(pos_name_cell)
         for k = 1:7
             if(int32(rel_err_mat_MTM(k,j)*100)>=config.GC_controller.GC_test_error_rate_threshold)
-                warning(sprintf('[Test Pos %d]: --%s Joint%d-- absolute torque error:[%.4f], error rate:[%d%%], has exceed the error rate threshold %d%%',...
+                warning('[Test Pos %d]: --%s Joint%d-- absolute torque error:[%.4f], error rate:[%d%%], has exceed the error rate threshold %d%%',...
                     j,ARM_NAME,k,...
                     abs_err_mat_MTM(k,j), int32(rel_err_mat_MTM(k,j)*100),...
-                    config.GC_controller.GC_test_error_rate_threshold));
+                    config.GC_controller.GC_test_error_rate_threshold);
 
                 return
             end

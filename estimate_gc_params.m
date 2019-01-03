@@ -8,8 +8,8 @@ function mtm_gc_controller = estimate_gc_params(ARM_NAME,SN)
     % argument input type checking
     arguement_checking(ARM_NAME,SN)
 
-    disp(sprintf('This software is being developed by Biorobotics and Medical Technology Group of The Chinese University of Hong Kong (CUHK).'));
-    disp(sprintf('Author(s):  Hongbin LIN, Vincent Hui, Samuel Au'));
+    disp('This software is being developed by Biorobotics and Medical Technology Group of The Chinese University of Hong Kong (CUHK).');
+    disp('Author(s):  Hongbin LIN, Vincent Hui, Samuel Au');
 
     output_file_str = wizard_config_dataCollection(ARM_NAME, SN);
     output_file_str = dataCollection(output_file_str);
@@ -21,10 +21,10 @@ end
 function arguement_checking(ARM_NAME,SN)
     % Argument Checking
     if~ischar(ARM_NAME)| ~ischar(SN)
-        error('Both Argument ''ARM_NAME'' and ''SN'' should be string object');
+        error('Both arguments ''ARM_NAME'' and ''SN'' should be string objects');
     end
     if~(strcmp(ARM_NAME,'MTML') | strcmp(ARM_NAME,'MTMR') )
-        error(sprintf(['Input of argument ''ARM_NAME''= %s is error, you should input one of the string',...
-                       '[''MTML'',''MTMR'']'],ARM_NAME));
+        error(['Input of argument ''ARM_NAME''= %s is incorrect, you should input one of the strings ',...
+               '[''MTML'',''MTMR'']'], ARM_NAME);
     end
 end
