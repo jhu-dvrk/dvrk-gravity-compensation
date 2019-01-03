@@ -30,7 +30,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
     config.date_time = date_time;
 
     % Save wizard JSON file
-    output_file_str = [input_data_path_with_date,'/', 'dataCollection_info.json'];
+    output_file_str = [input_data_path_with_date, '/', 'dataCollection_info.json'];
     fid = fopen(output_file_str,'w');
     jsonStr = jsonencode(config);
     fwrite(fid, jsonStr);
@@ -41,13 +41,13 @@ function output_file_str = dataCollection(dataCollection_config_str)
     mtm_arm = mtm(ARM_NAME);
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 
-    [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6]= setting_dataCollection(config,...
+    [config_joint1, config_joint2, config_joint3, config_joint4, config_joint5, config_joint6, nb_steps] = setting_dataCollection(config,...
         input_data_path_with_date);
 
     % dataCollection
     is_collision_checking = false;
     is_collecting_data = true;
-    progress_increment = 100.0 / 6.0; % 6 steps
+    progress_increment = 100.0 / nb_steps;
     progress = 0.0;
     output_data_struct.joint6 = collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment);
     progress = progress + progress_increment;

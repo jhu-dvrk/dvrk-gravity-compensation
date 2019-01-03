@@ -1,4 +1,4 @@
-function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6]= setting_dataCollection(config,...
+function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6,nb_steps]= setting_dataCollection(config,...
         input_data_path_with_date)
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
@@ -7,7 +7,7 @@ function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint
     %  no warranty. The complete license can be found in LICENSE
 
 
-    % Genneral Setting
+    % General Setting
     root_data_path = input_data_path_with_date;
     sample_num = config.data_collection.sample_num;
     is_pos_dir = config.data_collection.is_pos_dir;
@@ -15,7 +15,13 @@ function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint
     steady_time = config.data_collection.steady_time;
     arm_name = config.ARM_NAME;
 
-
+    nb_steps = 0;
+    if is_pos_dir
+        nb_steps = nb_steps + 6;
+    end
+    if is_neg_dir
+        nb_steps = nb_steps + 6;
+    end
 
     %% Data collection setting of Joint6
     % User Setting
