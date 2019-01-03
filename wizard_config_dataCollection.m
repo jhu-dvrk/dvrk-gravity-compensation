@@ -243,13 +243,11 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
     fprintf('Arm: %s\n', ARM_NAME);
     fprintf('Joint_No: %d\n', Joint_No);
     fprintf('Customized Param Name: %s\n', param_name);
-    disp('Increase the value by 1 degree: [i]');
-    disp('Decrease the value by 1 degree: [d]');
-    disp('Finish the process: [f]:');
+    disp('[i] to increase, [d] to decrease, [r] for recommended, [f] when done');
     fprintf('Recommended value: [%s] = %d degree(s)\n', param_name, default_value);
     lastsize = 0;
     while (true)
-        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
+        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'r') && ~strcmp(input_str,'f'))
             fprintf(repmat('\b', 1, lastsize));
             lastsize = fprintf('Current value: [%s] = %d degree(s)', param_name, customized_value);
             w = waitforbuttonpress;
@@ -257,10 +255,12 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
                 input_str = get(gcf, 'CurrentCharacter');
             end
         end
-        if(input_str == 'i')
-            customized_value = customized_value+1;
-        elseif(input_str == 'd')
-            customized_value = customized_value-1;
+        if (input_str == 'i')
+            customized_value = customized_value + 1;
+        elseif (input_str == 'd')
+            customized_value = customized_value - 1;
+        elseif (input_str == 'r')
+            customized_value = default_value;
         else
             fprintf(repmat('\b', 1, lastsize)); % clear last printed line
             break
@@ -294,13 +294,11 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
     fprintf('Arm: %s\n', ARM_NAME);
     fprintf('Joint_No: %d\n', 2);
     fprintf('Customized Param Name: %s\n', param_name);
-    disp('Increase the value by 1 degree: [i]');
-    disp('Decrease the value by 1 degree: [d]');
-    disp('Finish the process: [f]:');
-    fprintf('Recommended value: [%s] = %d degree(s)\n', param_name,default_value);
+    disp('[i] to increase, [d] to decrease, [r] for recommended, [f] when done');
+    fprintf('Recommended value: [%s] = %d degree(s)\n', param_name, default_value);
     lastsize = 0;
     while (true)
-        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'f'))
+        while (~strcmp(input_str,'i') && ~strcmp(input_str,'d') && ~strcmp(input_str,'r') && ~strcmp(input_str,'f'))
             fprintf(repmat('\b', 1, lastsize));
             lastsize = fprintf('Current value: [%s] = %d degree(s)', param_name, customized_value);
             w = waitforbuttonpress;
@@ -308,10 +306,12 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
                 input_str = get(gcf, 'CurrentCharacter');
             end
         end
-        if(input_str == 'i')
-            customized_value = customized_value+1;
-        elseif(input_str == 'd')
-            customized_value = customized_value-1;
+        if (input_str == 'i')
+            customized_value = customized_value + 1;
+        elseif (input_str == 'd')
+            customized_value = customized_value - 1;
+        elseif (input_str == 'r')
+            customized_value = default_value;
         else
             fprintf(repmat('\b', 1, lastsize)); % clear last printed line
             break
