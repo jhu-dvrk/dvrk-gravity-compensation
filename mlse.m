@@ -72,8 +72,6 @@ function output_file_str = mlse(dataCollection_info_str)
     % Gravity compensation test
     if ~gravity_compensation_test(config)
         disp('Gravity compensation test fail.')
-        output_file_name = '';
-        return
     end
 
     % Save the output parameters for gravity compensation controller
