@@ -230,6 +230,14 @@ You will also need to create the arm configuration file `MTMR-31519.json` in you
 }
 ```
 
+
+## Estimation using existing collected data folder
+  If you want to do estimation for multiple times or re-generate the "gc-<ARM-NAME>-<SN>.json" using existing collected data folder, run in matlab cosole:
+  
+```
+mlse('<path-to-your-existing-data-folder-with-date>/dataCollection_info.json')
+```
+
 # Contact
 
 This software is being developed by Biorobotics and Medical Technology Group of The Chinese University of Hong Kong (CUHK).
