@@ -111,7 +111,7 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
                     [current_position(:,i,j), ~, ~] = mtm_arm.get_state_joint_current();
                 end
                 fprintf(repmat('\b', 1, lastsize));
-                lastsize = fprintf('Angle %d (%5.2f%%)', int32(rad2deg(joint_trajectory(config.Train_Joint_No, i))), current_progress);
+                lastsize = fprintf('Angle %d (%5.2f%%), do not touch MTM..', int32(rad2deg(joint_trajectory(config.Train_Joint_No, i))), current_progress);
                 % update progress
                 current_progress = current_progress + one_data_progress_increment;
             end
