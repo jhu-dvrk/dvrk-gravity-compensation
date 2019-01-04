@@ -75,10 +75,12 @@ function output_file_str = mlse(dataCollection_info_str)
     % Gravity compensation test
     if ~gravity_compensation_test(config)
         disp('Gravity compensation test fail.')
+        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-notTrust.json'];
+    else
+        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     end
-
+    
     % Save the output parameters for gravity compensation controller
-    output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     fid = fopen(output_file_str,'w');
     jsonStr = jsonencode(config);
     fwrite(fid, jsonStr);
