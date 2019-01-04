@@ -41,32 +41,27 @@ function output_file_str = dataCollection(dataCollection_config_str)
     mtm_arm = mtm(ARM_NAME);
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 
-    [config_joint1, config_joint2, config_joint3, config_joint4, config_joint5, config_joint6, nb_steps] = setting_dataCollection(config,...
-        input_data_path_with_date);
+    config_joint_list = setting_dataCollection(config,...
+                                               input_data_path_with_date);
 
     % dataCollection
     is_collision_checking = false;
-    is_collecting_data = true;
-    total_data_sets = config_joint1.data_size + config_joint2.data_size + config_joint3.data_size + config_joint4.data_size + config_joint5.data_size + config_joint6.data_size;
-    progress_increment = 100.0 * config_joint1.data_size/total_data_sets;
-    progress = 0.0;
+    is_collecting_data = true; 
+    current_progress = 0.0;
+    total_data_sets = 0
+    for j=1:size(config_joint_list,2)
+        total_data_sets = total_data_sets + config_joint_list{j}.data_size; 
+    end
     one_data_progress_increment = 100 / total_data_sets;
-    output_data_struct.joint6 = collect_mtm_one_joint(config_joint6, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
-    progress = progress + progress_increment;
-    progress_increment = 100.0 * config_joint2.data_size/total_data_sets;
-    output_data_struct.joint5 = collect_mtm_one_joint(config_joint5, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
-    progress = progress + progress_increment;
-    progress_increment = 100.0 * config_joint3.data_size/total_data_sets;
-    output_data_struct.joint4 = collect_mtm_one_joint(config_joint4, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
-    progress = progress + progress_increment;
-    progress_increment = 100.0 * config_joint4.data_size/total_data_sets;
-    output_data_struct.joint3 = collect_mtm_one_joint(config_joint3, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
-    progress = progress + progress_increment;
-    progress_increment = 100.0 * config_joint5.data_size/total_data_sets;
-    output_data_struct.joint2 = collect_mtm_one_joint(config_joint2, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
-    progress = progress + progress_increment;
-    progress_increment = 100.0 * config_joint6.data_size/total_data_sets;
-    output_data_struct.joint1 = collect_mtm_one_joint(config_joint1, mtm_arm, is_collision_checking, is_collecting_data, progress, progress_increment, one_data_progress_increment);
+    for i=1:size(config_joint_list,2)
+            one_data_progress_increment = 100.0 /total_data_sets;
+            current_progress = collect_mtm_one_joint(config_joint_list{i},...
+                                  mtm_arm,...
+                                  is_collision_checking,...
+                                  is_collecting_data,...
+                                  current_progress,...
+                                  one_data_progress_increment);
+    end
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 end
 

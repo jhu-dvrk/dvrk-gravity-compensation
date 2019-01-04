@@ -1,5 +1,5 @@
-function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6,nb_steps]= setting_dataCollection(config,...
-        input_data_path_with_date)
+function config_joint_list = setting_dataCollection(config,...
+                                                    input_data_path_with_date)
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
     %  Copyright (c)  2018, The Chinese University of Hong Kong
@@ -15,13 +15,6 @@ function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint
     steady_time = config.data_collection.steady_time;
     arm_name = config.ARM_NAME;
 
-    nb_steps = 0;
-    if is_pos_dir
-        nb_steps = nb_steps + 6;
-    end
-    if is_neg_dir
-        nb_steps = nb_steps + 6;
-    end
 
     %% Data collection setting of Joint6
     % User Setting
@@ -160,5 +153,6 @@ function [config_joint1, config_joint2, config_joint3,config_joint4,config_joint
         is_neg_dir,...
         steady_time,...
         repeat_times);
+    config_joint_list = {config_joint1, config_joint2, config_joint3,config_joint4,config_joint5,config_joint6};
 
 end
