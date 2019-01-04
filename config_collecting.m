@@ -99,7 +99,15 @@ classdef config_collecting
                         obj.neg_joint_range_list{end+1} = temp;
                     end
                 end
-                obj.data_size = size(train_angle_list,2) * size(theta_angle_list, 2);
+                
+                obj.data_size =0;
+                if is_pos_dir
+                    obj.data_size = obj.data_size + size(train_angle_list,2) * size(theta_angle_list, 2);
+                end
+                if is_neg_dir
+                    obj.data_size = obj.data_size + size(train_angle_list,2) * size(theta_angle_list, 2);
+                end
+                obj.data_size = obj.data_size*obj.repeat_times;
             else
                 Error('Number of Argument should be above 12');
             end
@@ -128,7 +136,13 @@ classdef config_collecting
                 end
                 sum = sum + size( range_tempt{obj.Train_Joint_No},2);
             end
-            obj.data_size = sum;
+            obj.data_size =0;
+            if obj.is_pos_dir
+                obj.data_size = obj.data_size + sum*obj.repeat_times
+            end
+            if obj.is_neg_dir
+                obj.data_size = obj.data_size + sum*obj.repeat_times
+            end
             obj.pos_joint_range_list = pos_joint_range_list;
             obj.neg_joint_range_list = neg_joint_range_list;
         end
@@ -156,7 +170,13 @@ classdef config_collecting
                 end
                 sum = sum + size( range_tempt{obj.Train_Joint_No},2);
             end
-            obj.data_size = sum;
+            obj.data_size =0;
+            if obj.is_pos_dir
+                obj.data_size = obj.data_size + sum*obj.repeat_times
+            end
+            if obj.is_neg_dir
+                obj.data_size = obj.data_size + sum*obj.repeat_times
+            end
             obj.pos_joint_range_list = pos_joint_range_list;
             obj.neg_joint_range_list = neg_joint_range_list;
         end
