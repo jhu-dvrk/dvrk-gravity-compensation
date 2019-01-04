@@ -189,6 +189,10 @@ In this process, dataCollection of MTM will be executed. This usually spend abou
 ## C) Process#3 **[mlse]** (auto):
 In this process, the dynamic parameters will be estimated by multi-steps least square estimation. (No user input is required)
 
+- **After finish estimation step, the process will pause waiting for user's console input. You can type [y] to contine the process**
+
+(It avoids applying gc controller when user is absent and therefore causing dangerous)
+
 ## D) Process#4 **[gc_controller]** (auto):
 In this process, gravity compensation controller will be applied by loading the dynamics parameters.(No user input is required)
 
