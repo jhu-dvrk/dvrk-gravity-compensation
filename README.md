@@ -231,6 +231,27 @@ You will also need to create the arm configuration file `MTMR-31519.json` in you
 }
 ```
 
+To test the dVRK console with the new gravity compensation parameters, you can use the command line `rostopic pub` to turn gravity compensation on and off.  We strongly recommend that you keep one hand on the MTM the whole time to prevent it from drifting/accelerating and potentially hit something.  The steps are:
+ * Start the `dvrk_console_json` node.
+ * Home the arm using the GUI
+ * In a separate terminal, use `rostopic pub` to control the arm.  Remember that using the "tab" key will autocomplete the rostopic as well as the possible playloads so use hit the "tab" key over and over...
+   * To turn gravity on/off (replace `true` by `false`), use:
+   ```sh
+   rostopic pub /dvrk/MTMR/set_gravity_compensation std_msgs/Bool "data: true" -1
+   ```
+   * To activate the effort mode, send a zero wrench using:
+   ```sh
+   rostopic pub /dvrk/MTMR/set_wrench_body geometry_msgs/Wrench "force:
+     x: 0.0
+     y: 0.0
+     z: 0.0
+   torque:
+     x: 0.0
+     y: 0.0
+     z: 0.0" -1
+   ```
+
+Again, keep one hand on the MTM the whole time!
 
 ## Estimation using existing collected data folder
   If you want to do estimation for multiple times or re-generate the "gc-<"ARM-NAME">-<"SN">.json" using existing collected data folder, run in matlab cosole:
