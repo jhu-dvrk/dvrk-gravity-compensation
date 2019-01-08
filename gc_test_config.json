@@ -1,0 +1,18 @@
+{
+  "GC_Test": {
+    "ONLINE_GC_PRT_ERR": {
+      "testing_sets":{
+          "pos_1":[0,0,0,0,90,0,0],
+          "pos_2":[0,10,0,0,90,0,0],
+          "pos_3":[0,10,10,0,90,0,0]},
+      "abs_err_threshold":[0.1,0.1,0.1,0.1,0.1,0.1,0.1],
+      "rel_err_threshold":[30,30,30,30,30,30,30],
+      "divider_const_vec":[0.1,0.05,0.05,0.05,0.008,0.008,0.008]
+     },
+    "ONLINE_GC_DRT": {
+        "duration": 2,
+        "rate": 100,
+        "safe_vel_limit":  [2,2,2,2,6,6,2]
+    }
+  }
+}

@@ -64,16 +64,25 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     output_dynamic_matrix = lse_mtm_one_joint(config_lse_joint1 ,config_lse_joint2);
 
     % Save info into config
-    [joint_angle_upper_limit, joint_angle_lower_limit] = generate_joint_angle_limit(config);
+    [joint_position_upper_limit, joint_position_lower_limit] = generate_joint_angle_limit(config);
     config = rmfield(config,'data_collection');
     config.GC_controller.gc_dynamic_params_pos = output_dynamic_matrix(1:40)';
     config.GC_controller.gc_dynamic_params_neg = [output_dynamic_matrix(1:10);output_dynamic_matrix(41:70)]';
-    config.GC_controller.joint_angle_upper_limit = joint_angle_upper_limit;
-    config.GC_controller.joint_angle_lower_limit = joint_angle_lower_limit;
+    config.GC_controller.joint_position_upper_limit = joint_position_upper_limit;
+    config.GC_controller.joint_position_lower_limit = joint_position_lower_limit;
     config.version = '1.0';
 
     % Gravity compensation test
-    if ~gravity_compensation_test(config)
+    fid = fopen('gc_test_config.json');
+    if fid<3
+        error('Cannot read file "gc_test_config.json"')
+    end
+    raw = fread(fid, inf);
+    str = char(raw');
+    fclose(fid);
+    config_temp = jsondecode(str);
+    config.GC_Test = config_temp.GC_Test;
+    if ~gravity_compensation_test(config, 'ONLINE_GC_DRT')
         disp('Gravity compensation test fail.')
         is_gc_test_pass  = false;
         output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-notTrust.json'];
@@ -434,45 +443,45 @@ end
 % Gravity compensation test
 
 
-function [joint_angle_upper_limit, joint_angle_lower_limit] =  generate_joint_angle_limit(config)
-    joint_angle_upper_limit = zeros(1,7);
-    joint_angle_lower_limit = zeros(1,7);
+function [joint_position_upper_limit, joint_position_lower_limit] =  generate_joint_angle_limit(config)
+    joint_position_upper_limit = zeros(1,7);
+    joint_position_lower_limit = zeros(1,7);
     
     if strcmp(config.ARM_NAME, 'MTML')
-        joint_angle_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTML;
-        joint_angle_upper_limit(2) = config.data_collection.joint2.train_angle_max;
-        joint_angle_upper_limit(3) = config.data_collection.joint3.train_angle_max;
-        joint_angle_upper_limit(4) = config.data_collection.joint4.train_angle_max.MTML;
-        joint_angle_upper_limit(5) = config.data_collection.joint5.train_angle_max;
-        joint_angle_upper_limit(6) = config.data_collection.joint6.train_angle_max;
-        joint_angle_upper_limit(7) = 400;
+        joint_position_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTML;
+        joint_position_upper_limit(2) = config.data_collection.joint2.train_angle_max;
+        joint_position_upper_limit(3) = config.data_collection.joint3.train_angle_max;
+        joint_position_upper_limit(4) = config.data_collection.joint4.train_angle_max.MTML;
+        joint_position_upper_limit(5) = config.data_collection.joint5.train_angle_max;
+        joint_position_upper_limit(6) = config.data_collection.joint6.train_angle_max;
+        joint_position_upper_limit(7) = 400;
 
-        joint_angle_lower_limit(1) = config.data_collection.joint1.train_angle_min.MTML;
-        joint_angle_lower_limit(2) = config.data_collection.joint2.train_angle_min;
-        joint_angle_lower_limit(3) = config.data_collection.joint3.train_angle_min;
-        joint_angle_lower_limit(4) = config.data_collection.joint4.train_angle_min.MTML;
-        joint_angle_lower_limit(5) = config.data_collection.joint5.train_angle_min;
-        joint_angle_lower_limit(6) = config.data_collection.joint6.train_angle_min;
-        joint_angle_lower_limit(7) = -400;
+        joint_position_lower_limit(1) = config.data_collection.joint1.train_angle_min.MTML;
+        joint_position_lower_limit(2) = config.data_collection.joint2.train_angle_min;
+        joint_position_lower_limit(3) = config.data_collection.joint3.train_angle_min;
+        joint_position_lower_limit(4) = config.data_collection.joint4.train_angle_min.MTML;
+        joint_position_lower_limit(5) = config.data_collection.joint5.train_angle_min;
+        joint_position_lower_limit(6) = config.data_collection.joint6.train_angle_min;
+        joint_position_lower_limit(7) = -400;
     end
     
    
     if strcmp(config.ARM_NAME, 'MTMR')
-        joint_angle_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTMR;
-        joint_angle_upper_limit(2) = config.data_collection.joint2.train_angle_max;
-        joint_angle_upper_limit(3) = config.data_collection.joint3.train_angle_max;
-        joint_angle_upper_limit(4) = config.data_collection.joint4.train_angle_max.MTMR;
-        joint_angle_upper_limit(5) = config.data_collection.joint5.train_angle_max;
-        joint_angle_upper_limit(6) = config.data_collection.joint6.train_angle_max;
-        joint_angle_upper_limit(7) = 400;
+        joint_position_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTMR;
+        joint_position_upper_limit(2) = config.data_collection.joint2.train_angle_max;
+        joint_position_upper_limit(3) = config.data_collection.joint3.train_angle_max;
+        joint_position_upper_limit(4) = config.data_collection.joint4.train_angle_max.MTMR;
+        joint_position_upper_limit(5) = config.data_collection.joint5.train_angle_max;
+        joint_position_upper_limit(6) = config.data_collection.joint6.train_angle_max;
+        joint_position_upper_limit(7) = 400;
 
-        joint_angle_lower_limit(1) = config.data_collection.joint1.train_angle_min.MTMR;
-        joint_angle_lower_limit(2) = config.data_collection.joint2.train_angle_min;
-        joint_angle_lower_limit(3) = config.data_collection.joint3.train_angle_min;
-        joint_angle_lower_limit(4) = config.data_collection.joint4.train_angle_min.MTMR;
-        joint_angle_lower_limit(5) = config.data_collection.joint5.train_angle_min;
-        joint_angle_lower_limit(6) = config.data_collection.joint6.train_angle_min;
-        joint_angle_lower_limit(7) = -400;
+        joint_position_lower_limit(1) = config.data_collection.joint1.train_angle_min.MTMR;
+        joint_position_lower_limit(2) = config.data_collection.joint2.train_angle_min;
+        joint_position_lower_limit(3) = config.data_collection.joint3.train_angle_min;
+        joint_position_lower_limit(4) = config.data_collection.joint4.train_angle_min.MTMR;
+        joint_position_lower_limit(5) = config.data_collection.joint5.train_angle_min;
+        joint_position_lower_limit(6) = config.data_collection.joint6.train_angle_min;
+        joint_position_lower_limit(7) = -400;
     end
 end
 
