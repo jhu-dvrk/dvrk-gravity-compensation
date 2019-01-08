@@ -13,8 +13,8 @@ function mtm_gc_controller = estimate_gc_params(ARM_NAME,SN)
 
     output_file_str = wizard_config_dataCollection(ARM_NAME, SN);
     output_file_str = dataCollection(output_file_str);
-    output_file_str = mlse(output_file_str);
-    if console_inquire()
+    [output_file_str, is_gc_test_pass] = mlse(output_file_str);
+    if console_inquire(is_gc_test_pass)
         mtm_gc_controller = [];
         return
     end
@@ -33,8 +33,13 @@ function arguement_checking(ARM_NAME,SN)
     end
 end
 
-function is_exist_program = console_inquire()
+function is_exist_program = console_inquire(is_gc_test_pass)
     disp(sprintf('Estimation step has finished, do you want to continue?'))
+    if is_gc_test_pass
+        disp(sprintf('GC test status: passed!'))
+    else
+        disp(sprintf('GC test status: not passed! It might damage your device'))
+    end
     disp(sprintf('yes and start gc controller [y]'))
     disp(sprintf('no and exist the program [n]:'))
     input_str = '';
