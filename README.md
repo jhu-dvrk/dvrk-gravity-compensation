@@ -7,17 +7,18 @@
   - [1. launch dVRK console](#1-launch-dvrk-console)
   - [2.Initialize MATLAB](#2initialize-matlab)
   - [3. Runing MATLAB Script Program](#3-runing-matlab-script-program)
-  - [A) **[wizard\_config\_dataCollection]** (require user input)](#a-wizard%5C_config%5C_datacollection-require-user-input)
-    - [A) Step #1:](#a-step-1)
-    - [A) Step #2:](#a-step-2)
-    - [A) Step #3:](#a-step-3)
-    - [A) Step #4:](#a-step-4)
-    - [A) Step #5:](#a-step-5)
-    - [A) Step #6:](#a-step-6)
-  - [B) **[dataCollection]** (auto):](#b-datacollection-auto)
-  - [C) Process#3 **[mlse]** (auto):](#c-process3-mlse-auto)
-  - [D) Process#4 **[gc_controller]** (auto):](#d-process4-gc_controller-auto)
+    - [A) **[wizard\_config\_dataCollection]** (require user input)](#a-wizard%5C_config%5C_datacollection-require-user-input)
+      - [A) Step #1:](#a-step-1)
+      - [A) Step #2:](#a-step-2)
+      - [A) Step #3:](#a-step-3)
+      - [A) Step #4:](#a-step-4)
+      - [A) Step #5:](#a-step-5)
+      - [A) Step #6:](#a-step-6)
+    - [B) **[dataCollection]** (auto):](#b-datacollection-auto)
+    - [C) Process#3 **[mlse]** (auto):](#c-process3-mlse-auto)
+    - [D) Process#4 **[gc_controller]** (auto):](#d-process4-gc_controller-auto)
 - [Loading the gravity compensation configuration file in dVRK console](#loading-the-gravity-compensation-configuration-file-in-dvrk-console)
+  - [Estimation using existing collected data folder](#estimation-using-existing-collected-data-folder)
 - [Contact](#contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -93,14 +94,14 @@ Then the program starts. It will go through 4 processes:
 **D) [gc_controller]**.
 
 -----
-## A) **[wizard\_config\_dataCollection]** (require user input)
+### A) **[wizard\_config\_dataCollection]** (require user input)
 In this process, users need to set joint limits for the data collection process. Going through this process is necessary because we don't want our MTMs hit the environments. For the reason that each MTM can be installed in different environment, we need this process to set joints limits.
 
 After you step into this process, you will go through some instructions to set joint limits and then execute the collision checking.
 
 -----
 
-### A) Step #1:
+#### A) Step #1:
 MATLAB console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_1.png" width="1000"  />
@@ -120,7 +121,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 </p>
 
 ----------
-### A) Step #2:
+#### A) Step #2:
 MATLAB console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_2.png" width="1000"  />
@@ -132,7 +133,7 @@ Set the joint limit when distal link of MTM is around 10cm away from front panel
 </p>
 
 ----------
-### A) Step #3:
+#### A) Step #3:
 MATLAB console:
 <p align="center">
   <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_3.png" width="1000"  />
@@ -144,7 +145,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
  </p>
 
 ----------
-### A) Step #4:
+#### A) Step #4:
 MATLAB console:
 <p align="center">
    <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_4.png" width="1000"  />
@@ -156,7 +157,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
  </p>
 
 ----------
-### A) Step #5:
+#### A) Step #5:
 MATLAB console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_5.png"  />
@@ -168,7 +169,7 @@ Set the joint limit when distal link of MTM is around 10cm away from left panel.
  </p>
 
 ----------
-### A) Step #6:
+#### A) Step #6:
 MATLAB console:
 <p align="center">
   <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_6.png" width="1000"  />
@@ -183,17 +184,17 @@ Afterwards, it will execute **collision checking**. If you set the limit properl
 
 **Collision checking** is making MTM to move according to preset trajectory which will be apply in dataCollection. Therefore, if collision checking passes, MTM in the dataCollection process will be free from collision.
 
-## B) **[dataCollection]** (auto):
+### B) **[dataCollection]** (auto):
 In this process, dataCollection of MTM will be executed. This usually spend about 1hour. (No user input is required)
 
-## C) Process#3 **[mlse]** (auto):
+### C) Process#3 **[mlse]** (auto):
 In this process, the dynamic parameters will be estimated by multi-steps least square estimation. (No user input is required)
 
 - **After finish estimation step, the process will pause waiting for user's console input. You can type [y] to contine the process**
 
 (It avoids applying gc controller when user is absent and therefore causing dangerous)
 
-## D) Process#4 **[gc_controller]** (auto):
+### D) Process#4 **[gc_controller]** (auto):
 In this process, gravity compensation controller will be applied by loading the dynamics parameters.(No user input is required)
 
 To stop the gravity controller demo, you need to call `mtm_gc_controller.stop_gc()` (or maybe `ans.stop_gc()` depending on the variable you used as result of `estimate_gc_params`.   If you want to test the controller later on, i.e. without going through the first 3 steps, you can use `gc = gc_controller('gc-MTMx-xxxxx.json')`.
