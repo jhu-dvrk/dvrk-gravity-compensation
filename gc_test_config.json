@@ -12,7 +12,7 @@
     "ONLINE_GC_DRT": {
         "duration": 2,
         "rate": 100,
-        "safe_vel_limit":  [2,2,2,2,6,6,2]
+        "safe_vel_limit":  [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 100.0]
     }
   }
 }

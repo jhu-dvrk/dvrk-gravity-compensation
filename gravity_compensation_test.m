@@ -4,7 +4,7 @@ function is_test_success =  gravity_compensation_test(config, test_mode)
     if strcmp(test_mode, 'ONLINE_GC_PRT_ERR')
         is_test_success = online_gc_predict_error_test(mtm_gc_controller, config);
     elseif strcmp(test_mode, 'ONLINE_GC_DRT')
-        is_test_success = online_gc_drift_test(mtm_gc_controller, config)
+        is_test_success = online_gc_drift_test(mtm_gc_controller, config);
     end
 end
 
@@ -99,7 +99,10 @@ function [abs_err, rel_err] = online_gc_predict_error_controller(mtm_gc_controll
 end
 
 function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
+    disp('Started test estimating drift at a fixed position');
     mtm_gc_controller.mtm_arm.move_joint(deg2rad(zeros(1,7)));
+    % pause(5.0); % to make sure PID is stable
+    disp('Measuring drift...');
     mtm_gc_controller.start_gc_with_vel_safestop(config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
     rate = config.GC_Test.ONLINE_GC_DRT.rate;
     deta_time = 1/rate;
@@ -130,8 +133,8 @@ function online_gc_drift_vel_plot(vel_mat, duration)
     figure
     for i = 1:7
         subplot(7,1,i);
-        x = linspace(0,duration,size(vel_mat,2));
-        plot(x,vel_mat(i,:));
-        title(sprintf("Veloctiy for Joint#%d", i));
+        x = linspace(0, duration, size(vel_mat, 2));
+        plot(x, vel_mat(i,:));
+        title(sprintf("Velocity for joint %d", i));
     end
 end

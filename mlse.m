@@ -83,12 +83,12 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     config_temp = jsondecode(str);
     config.GC_Test = config_temp.GC_Test;
     if ~gravity_compensation_test(config, 'ONLINE_GC_DRT')
-        disp('Gravity compensation test fail.')
+        disp('WARNING: Gravity compensation test failed.  Be careful when using the generated parameters.')
         is_gc_test_pass  = false;
-        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-notTrust.json'];
+        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-not-trusted.json'];
     else
         is_gc_test_pass = true;
-        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-Trust.json'];
+        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     end
     
     % Save the output parameters for gravity compensation controller
@@ -96,7 +96,7 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     jsonStr = jsonencode(config);
     fwrite(fid, jsonStr);
     fclose(fid);
-    disp(sprintf('Save config file to %s', output_file_str));
+    fprintf('Save config file to %s\n', output_file_str);
 
 end
 
@@ -193,7 +193,7 @@ function dynamic_parameters_vec = lse_model(config_lse_joint1,...
 
     disp('Output Parameters: [Value], [Relative_std(%)]');
     for i=1:size(output_param_map.keys,2)
-        disp(sprintf('Param_%d: [%0.4f], [%0.1f%%]',output_keys{i}, output_values{i}, output_param_rel_std_values{i}));
+        fprintf('Param_%d: [%0.4f], [%0.1f%%]\n', output_keys{i}, output_values{i}, output_param_rel_std_values{i});
     end
     disp(' ');
 
