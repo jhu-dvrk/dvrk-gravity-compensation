@@ -70,6 +70,8 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
             config.Train_Joint_No, dir_name);
         disp('If the MTM hits the environment, please hit E-Button to stop instantly!');
     end
+    
+    current_progress = input_progress;
 
     for  k = 1:size(joint_range_list,2)
         if config.Train_Joint_No == 1
@@ -93,7 +95,6 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
             end
         end
         if is_collecting_data
-            current_progress = input_progress;
             fprintf('Collecting torque data with Theta joint %d at angle %d, moving joint %d in %s direction (%5.2f%%, %s)\n',...
                 config.Theta_Joint_No,...
                 Theta,...
@@ -119,8 +120,8 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
             if exist(data_save_path)~=7
                 mkdir(data_save_path)
             end
-            file_str = strcat(data_save_path,'/',sprintf('theta%d',Theta),'.mat');
             current_date_time =datestr(datetime('now'),'mmmm-dd-yyyy-HH:MM:SS');
+            file_str = strcat(data_save_path,'/',sprintf('theta%d-',Theta),current_date_time,'.mat');
             save(file_str,...
                 'joint_trajectory','jranges_ranges','desired_effort',...
                 'current_position','Theta','current_date_time');
