@@ -28,31 +28,23 @@ function mtm_gc_controller = gc_controller(gc_controller_config_json)
     end
 
     % General Setting
-    safe_upper_torque_limit = config.GC_controller.safe_upper_torque_limit;
-    safe_lower_torque_limit = config.GC_controller.safe_lower_torque_limit;
-    GC_test_constant_vec = config.GC_controller.GC_test_constant_vec;
-    Zero_Output_Joint_No = [];
-    beta_vel_amplitude = config.GC_controller.beta_vel_amplitude;
     GC_controllers = [];
-    ARM_NAME = config.ARM_NAME;
-    g = config.lse.g_constant;
-
-    % Load MTM GC Param
-    dynamic_params_pos = config.GC_controller.gc_dynamic_params_pos;
-    dynamic_params_neg = config.GC_controller.gc_dynamic_params_neg;
-
+    param_num = 40; %hard code
+    
+    gc_dynamic_params_pos = param_vec_checking(config.GC_controller.gc_dynamic_params_pos, param_num, 1);
+    gc_dynamic_params_neg = param_vec_checking(config.GC_controller.gc_dynamic_params_neg, param_num, 1);
+    
+    
     % % Spawn GC Controllers and test
-    mtm_arm = mtm(ARM_NAME);
+    mtm_arm = mtm(config.ARM_NAME);
     mtm_gc_controller= controller(mtm_arm,...
-        dynamic_params_pos,...
-        dynamic_params_neg,...
-        safe_upper_torque_limit,...
-        safe_lower_torque_limit,...
-        beta_vel_amplitude,...
-        g,...
-        Zero_Output_Joint_No,...
-        GC_test_constant_vec,...
-        ARM_NAME);
+        gc_dynamic_params_pos,...
+        gc_dynamic_params_neg,...
+        config.GC_controller.safe_upper_torque_limit,...
+        config.GC_controller.safe_lower_torque_limit,...
+        config.GC_controller.beta_vel_amplitude,...
+        config.lse.g_constant,...
+        config.ARM_NAME);
 
     % Move to gc controller start joint position and wait until MTM remains static
     mtm_gc_controller.mtm_arm.move_joint(deg2rad(config.GC_controller.GC_init_pos));
@@ -77,4 +69,14 @@ function argument_checking(gc_controller_config_json)
     end
 end
 
-
+function gc_dynamic_params = param_vec_checking(input_vec, rows, columns)
+    [rows_t, columns_t] = size(input_vec);
+    if rows==rows_t && columns == columns_t
+        gc_dynamic_params = input_vec;
+    elseif rows==columns_t && rows == columns_t
+        gc_dynamic_params = input_vec';
+    else
+        error("size of dynamic vector is not correct. Current size is (%d, %d). Vector size for gc controller should be (%d, %d)",...
+                rows_t, columns_t, rows, columns);
+    end
+end

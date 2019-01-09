@@ -8,8 +8,8 @@ classdef controller < handle
     properties(Access = public)
         pub_tor
         sub_pos
-        dynamic_param_pos
-        dynamic_param_neg
+        dynamic_params_pos_vec
+        dynamic_params_neg_vec
         safe_upper_torque_limit
         safe_lower_torque_limit
         beta_vel_amplitude
@@ -26,8 +26,8 @@ classdef controller < handle
     methods(Access = public)
         % Class constructor
         function obj = controller(mtm_arm,...
-                dynamic_params_pos,...
-                dynamic_params_neg,...
+                dynamic_params_pos_vec,...
+                dynamic_params_neg_vec,...
                 safe_upper_torque_limit,...
                 safe_lower_torque_limit,...
                 beta_vel_amplitude,...
@@ -39,11 +39,11 @@ classdef controller < handle
             obj.g = g;
             obj.mtm_arm = mtm_arm;
             obj.ARM_NAME = ARM_NAME;
-            obj.dynamic_param_pos = dynamic_params_pos;
-            obj.dynamic_param_neg = dynamic_params_neg;
+            obj.dynamic_params_pos_vec = dynamic_params_pos_vec;
+            obj.dynamic_params_neg_vec = dynamic_params_neg_vec;
             disp('Controller dynamic parameters of MTM: [param]');
-            for i=1:size(obj.dynamic_param_pos,1)
-                fprintf('Param_%d: [%0.5f], [%0.5f]\n', i, obj.dynamic_param_pos(i), obj.dynamic_param_neg(i));
+            for i=1:size(obj.dynamic_params_pos_vec,1)
+                fprintf('Param_%d: [%0.5f], [%0.5f]\n', i, obj.dynamic_params_pos_vec(i), obj.dynamic_params_neg_vec(i));
             end
             obj.pub_tor = rospublisher(['/dvrk/',ARM_NAME,'/set_effort_joint']);
             obj.sub_pos = rossubscriber(['/dvrk/',ARM_NAME,'/state_joint_current']);
@@ -107,8 +107,8 @@ classdef controller < handle
         function Torques = base_controller(obj, q, q_dot)
             vel = q_dot;
             Regressor_Matrix =analytical_regressor_mat(obj.g,q);
-            Torques_pos = Regressor_Matrix*obj.dynamic_param_pos;
-            Torques_neg = Regressor_Matrix*obj.dynamic_param_neg;
+            Torques_pos = Regressor_Matrix*obj.dynamic_params_pos_vec;
+            Torques_neg = Regressor_Matrix*obj.dynamic_params_neg_vec;
             Torques = zeros(7,1);
             for i =1:6
                 % Fusing predicted torques with positive and negative direction
