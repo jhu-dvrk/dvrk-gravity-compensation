@@ -108,7 +108,7 @@ function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
     disp('Measuring drift...');
     mtm_gc_controller.start_gc_with_vel_safestop(config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
     rate = config.GC_Test.ONLINE_GC_DRT.rate;
-    deta_time = 1/rate;
+    delta_time = 1/rate;
     duration = config.GC_Test.ONLINE_GC_DRT.duration;
     pos_mat = [];
     vel_mat = [];
@@ -117,7 +117,7 @@ function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
         msg = receive(mtm_gc_controller.sub_pos);
         pos_mat = cat(2, pos_mat, msg.Position);
         vel_mat = cat(2, vel_mat, msg.Velocity);
-        pause(deta_time);
+        pause(delta_time);
         count = count +1;
     end
     if(~mtm_gc_controller.is_drift_vel_exceed_limit)
@@ -128,21 +128,21 @@ function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
             msg = receive(mtm_gc_controller.sub_pos);
             pos_mat = cat(2, pos_mat, msg.Position);
             vel_mat = cat(2, vel_mat, msg.Velocity);
-            pause(deta_time);
+            pause(delta_time);
         end
         mtm_gc_controller.stop_gc();
         is_test_success = false;
     end
-    online_gc_drift_vel_plot(vel_mat, duration, deta_time, config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
+    online_gc_drift_vel_plot(vel_mat, duration, delta_time, config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
     
 end
 
-function online_gc_drift_vel_plot(vel_mat, duration, deta_time, safe_vel_limit)
+function online_gc_drift_vel_plot(vel_mat, duration, delta_time, safe_vel_limit)
     figure
     for i = 1:7
         subplot(7,1,i);
-        x = deta_time: deta_time:size(vel_mat, 2)*deta_time;
-        x_limit = deta_time: deta_time: duration; 
+        x = delta_time: delta_time:size(vel_mat, 2)*delta_time;
+        x_limit = delta_time: delta_time: duration; 
         plot(x, vel_mat(i,:), x_limit, safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--', x_limit, -safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--');
         title(sprintf('Velocity of joint #%d for drift test within %.1f seconds', i, duration));
         if max(vel_mat(i,:),[],2) <=safe_vel_limit(i)

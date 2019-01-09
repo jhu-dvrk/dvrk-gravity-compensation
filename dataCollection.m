@@ -48,7 +48,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
     is_collision_checking = false;
     is_collecting_data = true; 
     current_progress = 0.0;
-    total_data_sets = 0
+    total_data_sets = 0;
     for j=1:size(config_joint_list,2)
         total_data_sets = total_data_sets + config_joint_list{j}.data_size; 
     end

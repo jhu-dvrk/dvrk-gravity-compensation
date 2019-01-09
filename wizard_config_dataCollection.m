@@ -330,12 +330,12 @@ end
 
 function argument_checking(ARM_NAME,...
         SN)
-    if~strcmp(ARM_NAME,'MTML') && ~strcmp(ARM_NAME,'MTMR')
-        error(['Input of argument ''ARM_NAME''= %s is error, you should input one of the string',...
-            '[''MTML'',''MTMR'']'],ARM_NAME);
+    if~strcmp(ARM_NAME, 'MTML') && ~strcmp(ARM_NAME, 'MTMR')
+        error(['Input of argument ''ARM_NAME''= %s is error, you should input one of the strings ',...
+            '[''MTML'',''MTMR'']'], ARM_NAME);
     end
     if ~ischar(SN)
-        error('SN input %s is not char arrary', SN);
+        error('SN input %s is not char array', SN);
     end
 end
 
@@ -359,11 +359,19 @@ function collision_checking(config)
     config_joint_list = setting_dataCollection(config,...
                                                input_data_path);
     tic;
-    for i = 1:size(config_joint_list,2)
+    current_progress = 0.0;
+    total_data_sets = 0;
+    for j=1:size(config_joint_list, 2)
+        total_data_sets = total_data_sets + config_joint_list{j}.data_size; 
+    end
+    one_data_progress_increment = 100 / total_data_sets;
+    for i = 1:size(config_joint_list, 2)
         collect_mtm_one_joint(config_joint_list{i},...
                               mtm_arm,...
                               is_collision_checking,...
-                              is_collecting_data);
+                              is_collecting_data,...
+                              current_progress,...
+                              one_data_progress_increment);
     end
     mtm_arm.move_joint([0,0,0,0,0,0,0]);
 
