@@ -124,21 +124,37 @@ function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
         mtm_gc_controller.stop_gc();
         is_test_success = true;
     else
-        pause(2);
+        for i=1:20
+            msg = receive(mtm_gc_controller.sub_pos);
+            pos_mat = cat(2, pos_mat, msg.Position);
+            vel_mat = cat(2, vel_mat, msg.Velocity);
+            pause(deta_time);
+        end
         mtm_gc_controller.stop_gc();
         is_test_success = false;
     end
-    online_gc_drift_vel_plot(vel_mat, duration);
+    online_gc_drift_vel_plot(vel_mat, duration, deta_time, config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
     
 end
 
-function online_gc_drift_vel_plot(vel_mat, duration)
+function online_gc_drift_vel_plot(vel_mat, duration, deta_time, safe_vel_limit)
     figure
     for i = 1:7
         subplot(7,1,i);
-        x = linspace(0, duration, size(vel_mat, 2));
-        plot(x, vel_mat(i,:));
-        title(sprintf('Velocity for joint %d', i));
+        x = deta_time: deta_time:size(vel_mat, 2)*deta_time;
+        x_limit = deta_time: deta_time: duration; 
+        plot(x, vel_mat(i,:), x_limit, safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--', x_limit, -safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--');
+        title(sprintf('Velocity of joint #%d for drift test within %.1f seconds', i, duration));
+        if max(vel_mat(i,:),[],2) <=safe_vel_limit(i)
+            axis([0 duration -1.5*safe_vel_limit(i) 1.5*safe_vel_limit(i)])
+        else
+            axis tight
+        end
+        if i==3
+            ylabel('Joint Velocity(rad/s)') 
+        elseif i==7
+            xlabel('Time(s)') 
+        end
     end
 end
 
