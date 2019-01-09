@@ -52,16 +52,26 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
 
 
     % create config_LSE objects
-    [config_lse_joint1,config_lse_joint2, config_lse_joint3,config_lse_joint4,config_lse_joint5,config_lse_joint6]=...
-        setting_lse(config,input_data_path_with_date);
+    config_lse_list=setting_lse(config,input_data_path_with_date);
 
+    Torques_data_mat = [];
     % Multi-steps MLSE from Joint#6 to Joint#1.
-    lse_mtm_one_joint(config_lse_joint6);
-    lse_mtm_one_joint(config_lse_joint5, config_lse_joint6);
-    lse_mtm_one_joint(config_lse_joint4, config_lse_joint5);
-    lse_mtm_one_joint(config_lse_joint3 ,config_lse_joint4);
-    lse_mtm_one_joint(config_lse_joint2 ,config_lse_joint3);
-    output_dynamic_matrix = lse_mtm_one_joint(config_lse_joint1 ,config_lse_joint2);
+    for i=6:-1:1
+        if i==6
+            [~, Torques_data_tmp] = lse_mtm_one_joint(config_lse_list{i});
+            Torques_data_mat = cat(3, Torques_data_mat, Torques_data_tmp);
+        elseif i==1
+            [output_dynamic_matrix, Torques_data_tmp] = lse_mtm_one_joint(config_lse_list{i},config_lse_list{i+1});
+            Torques_data_mat = cat(3, Torques_data_mat, Torques_data_tmp);
+        else
+            [~, Torques_data_tmp] = lse_mtm_one_joint(config_lse_list{i},config_lse_list{i+1});
+            Torques_data_mat = cat(3, Torques_data_mat, Torques_data_tmp);
+        end
+    end
+    
+    [torque_upper_limit, torque_lower_limit] = traning_data_tor_limit(Torques_data_mat);
+    config.GC_controller.safe_upper_torque_limit = round(torque_upper_limit,5);
+    config.GC_controller.safe_lower_torque_limit = round(torque_lower_limit,5);
 
     % Save info into config
     [joint_position_upper_limit, joint_position_lower_limit] = generate_joint_angle_limit(config);
@@ -106,7 +116,7 @@ function argument_checking(input_data_path_with_date)
     end
 end
 
-function dynamic_param = lse_mtm_one_joint(config_lse_joint, previous_config)
+function [dynamic_parameters_vec, Torques_data_mat] = lse_mtm_one_joint(config_lse_joint, previous_config)
     %  Institute: The Chinese University of Hong Kong
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
@@ -114,16 +124,16 @@ function dynamic_param = lse_mtm_one_joint(config_lse_joint, previous_config)
     fprintf('LSE for joint %d started..\n', config_lse_joint.Joint_No);
 
     if ~exist('previous_config')
-        dynamic_param = lse_model(config_lse_joint);
+        [dynamic_parameters_vec, Torques_data_mat] = lse_model(config_lse_joint);
     else
         % if there is 'previous_config', we pass the path to the result of previous step of LSE to lse_model
-        dynamic_param = lse_model(config_lse_joint,...
+        [dynamic_parameters_vec, Torques_data_mat] = lse_model(config_lse_joint,...
             previous_config.output_param_path);
     end
 end
 
-function dynamic_parameters_vec = lse_model(config_lse_joint1,...
-        old_param_path)
+function [dynamic_parameters_vec, Torques_data_mat] = lse_model(config_lse_joint1,...
+                                            old_param_path)
 
     %  Institute: The Chinese University of Hong Kong
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
@@ -134,6 +144,8 @@ function dynamic_parameters_vec = lse_model(config_lse_joint1,...
 
     R2_augmented = [lse_obj.R2_augmented_pos; lse_obj.R2_augmented_neg];
     T2_augmented = [lse_obj.T2_augmented_pos; lse_obj.T2_augmented_neg];
+    
+    Torques_data_mat = cat(3,lse_obj.Torques_pos_data, lse_obj.Torques_neg_data); 
 
     % Generate the input argument,input_param_map and input_param_rel_std_map, for LSE
     if exist('old_param_path')
@@ -485,4 +497,12 @@ function [joint_position_upper_limit, joint_position_lower_limit] =  generate_jo
     end
 end
 
+function [torque_upper_limit, torque_lower_limit] = traning_data_tor_limit(Torques_data_mat)
+    measure_tor_mat=[];
+    for i=1:size(Torques_data_mat,3)
+        measure_tor_mat = cat(2,measure_tor_mat,Torques_data_mat(:,2,i));
+    end
+    torque_upper_limit = max(measure_tor_mat,[],2);
+    torque_lower_limit = min(measure_tor_mat,[],2);
+end
 

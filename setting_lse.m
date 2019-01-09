@@ -1,5 +1,4 @@
-function [config_lse_joint1,config_lse_joint2, config_lse_joint3,config_lse_joint4,config_lse_joint5,config_lse_joint6]=...
-        setting_LSE(config, data_input_root_path)
+function config_lse_list=setting_lse(config, data_input_root_path)
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
     %  Copyright (c)  2018, The Chinese University of Hong Kong
@@ -36,5 +35,7 @@ function [config_lse_joint1,config_lse_joint2, config_lse_joint3,config_lse_join
     Joint_No = 1;
     config_lse_joint1 =  config_lse(Joint_No,std_filter,Is_Plot,...
         issave_figure,[data_input_root_path,'/Train_Joint1'],config.lse.joint1.fit_method,g_constant);
+    
+    config_lse_list = {config_lse_joint1,config_lse_joint2,config_lse_joint3,config_lse_joint4,config_lse_joint5,config_lse_joint6};
 
 end

@@ -135,6 +135,6 @@ function online_gc_drift_vel_plot(vel_mat, duration)
         subplot(7,1,i);
         x = linspace(0, duration, size(vel_mat, 2));
         plot(x, vel_mat(i,:));
-        title(sprintf("Velocity for joint %d", i));
+        title(sprintf('Velocity for joint %d', i));
     end
 end
