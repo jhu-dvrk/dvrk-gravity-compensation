@@ -97,7 +97,8 @@ classdef controller < handle
                 for i =1:7
                     msg.Effort(i) = Torques(i);
                 end
-                msg.Effort(5) = 0.05;
+                % for testing
+%                 msg.Effort(5) = 0.05;
             end
             send(obj.pub_tor, msg);
         end
