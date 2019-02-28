@@ -12,7 +12,9 @@ classdef controller < handle
         dynamic_params_neg_vec
         safe_upper_torque_limit
         safe_lower_torque_limit
-        beta_vel_amplitude
+        db_vel_vec % dead band velocity vector
+        sat_vec_vec % satuated velocity vector
+        fric_comp_ratio_vec %friction compensation ratio: 0~1
         g
         Zero_Output_Joint_No
         mtm_arm
@@ -30,12 +32,13 @@ classdef controller < handle
                 dynamic_params_neg_vec,...
                 safe_upper_torque_limit,...
                 safe_lower_torque_limit,...
-                beta_vel_amplitude,...
+                db_vel_vec,...
+                sat_vec_vec,...
+                fric_comp_ratio_vec,...
                 g,...
                 ARM_NAME)
             obj.safe_upper_torque_limit = safe_upper_torque_limit;
             obj.safe_lower_torque_limit = safe_lower_torque_limit;
-            obj.beta_vel_amplitude = beta_vel_amplitude;
             obj.g = g;
             obj.mtm_arm = mtm_arm;
             obj.ARM_NAME = ARM_NAME;
@@ -47,6 +50,21 @@ classdef controller < handle
             end
             obj.pub_tor = rospublisher(['/dvrk/',ARM_NAME,'/set_effort_joint']);
             obj.sub_pos = rossubscriber(['/dvrk/',ARM_NAME,'/state_joint_current']);
+            if any(db_vel_vec)<0 
+                error('db_vel_vec should not be negative')
+            else
+                obj.db_vel_vec = db_vel_vec;
+            end   
+            if any(sat_vec_vec)<0 && any(sat_vec_vec)>1
+                error('sat_vec_vec should not be negative or smaller than db_vel_vec')
+            else
+                obj.sat_vec_vec = sat_vec_vec;
+            end
+            if any(fric_comp_ratio_vec)<0 && any(fric_comp_ratio_vec)>1
+                error('fric_comp_ratio should be between 0 to 1')
+            else
+                obj.fric_comp_ratio_vec = fric_comp_ratio_vec;
+            end
         end
 
         % Callback function of pose subscriber when start gc controller
@@ -112,7 +130,7 @@ classdef controller < handle
             Torques = zeros(7,1);
             for i =1:6
                 % Fusing predicted torques with positive and negative direction
-                alpha = obj.sin_vel(vel(i),obj.beta_vel_amplitude(i));
+                alpha = obj.dbs_vel(vel(i),obj.db_vel_vec(i), obj.sat_vec_vec(i), obj.fric_comp_ratio_vec(i));
                 Torques(i) = Torques_pos(i)*alpha+Torques_neg(i)*(1-alpha);
 
                 % Set upper and lower torque limit, if output value exceed limits, just keep the limit value for output
@@ -125,14 +143,20 @@ classdef controller < handle
             Torques(obj.Zero_Output_Joint_No) = 0;
         end
 
-        % Beta function for fusing torques
-        function sign_vel = sin_vel(obj, joint_vel, amplitude)
-            if joint_vel >= abs(amplitude)
-                sign_vel = 1;
-            elseif joint_vel <= -abs(amplitude)
-                sign_vel = 0;
-            else
-                sign_vel = 0.5+sin(pi*(joint_vel/amplitude)/2)/2;
+        
+        % %Deadband segmented friction function
+        % sign_vel = 0~1
+        function sign_vel = dbs_vel(obj, joint_vel, bd_vel, sat_vel, fric_comp_ratio)
+            if joint_vel >= sat_vel
+                sign_vel = 0.5+0.5*fric_comp_ratio;
+            elseif joint_vel <= -sat_vel
+                sign_vel = 0.5-0.5*fric_comp_ratio;
+            elseif joint_vel <= bd_vel && joint_vel >= -bd_vel
+                sign_vel = 0.5;
+            elseif joint_vel > bd_vel && joint_vel < sat_vel
+                sign_vel = 0.5*fric_comp_ratio*(joint_vel-bd_vel)/(sat_vel-bd_vel)+0.5;
+            elseif joint_vel < -bd_vel && joint_vel > -sat_vel
+                sign_vel = -0.5*fric_comp_ratio*(joint_vel-bd_vel)/(sat_vel-bd_vel)+0.5;
             end
         end
 
