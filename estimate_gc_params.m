@@ -40,6 +40,7 @@ function is_exist_program = console_inquire(is_gc_test_pass)
     else
         disp(sprintf('GC test status: not passed! It might damage your device'))
     end
+    disp(sprintf('[Input Required]: Input command on the current gravity drift test figure window'))
     disp(sprintf('yes and start gc controller [y]'))
     disp(sprintf('no and exist the program [n]:'))
     input_str = '';
