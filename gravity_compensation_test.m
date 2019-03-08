@@ -21,7 +21,7 @@ function mtm_gc_controller = online_test_init(config)
         config.GC_controller.safe_lower_torque_limit,...
         config.GC_controller.db_vel_vec,...
         config.GC_controller.sat_vec_vec,...
-        [0 0 0 0 0 0 0].',...
+        [0 0 0 0 0 0 0].',... %test without friction compensation
         config.lse.g_constant,...
         config.ARM_NAME);
 end
@@ -104,8 +104,8 @@ function [abs_err, rel_err] = online_gc_predict_error_controller(mtm_gc_controll
 end
 
 function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
-    disp('Started test estimating drift at a fixed position');
-    mtm_gc_controller.mtm_arm.move_joint(deg2rad(zeros(1,7)));
+    disp('Started test estimating drift at a start initial position');
+    mtm_gc_controller.mtm_arm.move_joint(deg2rad(config.GC_controller.GC_init_pos));
     % pause(5.0); % to make sure PID is stable
     disp('Measuring drift...');
     mtm_gc_controller.start_gc_with_vel_safestop(config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
