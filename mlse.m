@@ -80,7 +80,7 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     config.GC_controller.gc_dynamic_params_neg = [output_dynamic_matrix(1:10);output_dynamic_matrix(41:70)]';
     config.GC_controller.joint_position_upper_limit = joint_position_upper_limit;
     config.GC_controller.joint_position_lower_limit = joint_position_lower_limit;
-    config.version = '1.0';
+    config.version = '2.0';
 
     % Gravity compensation test
     fid = fopen('gc_test_config.json');

@@ -23,8 +23,8 @@ function mtm_gc_controller = gc_controller(gc_controller_config_json)
     config = jsondecode(str);
 
     % Version Checking
-    if config.version ~= '1.0'
-        error('The version of dVRK gravity compensation should be 1.0')
+    if ~strcmp(config.version, '2.0')
+        error('The version of gc_controller should be 2.0, your current verison of json config file is %s.', config.version)
     end
 
     % General Setting
