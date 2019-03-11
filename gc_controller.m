@@ -24,7 +24,7 @@ function mtm_gc_controller = gc_controller(gc_controller_config_json)
 
     % Version Checking
     if ~strcmp(config.version, '2.0')
-        error('The version of gc_controller should be 2.0, your current verison of json config file is %s.', config.version)
+        error('The version of gc_controller should be 2.0, your current version of json config file is %s.', config.version)
     end
 
     % General Setting
