@@ -67,6 +67,12 @@ addpath('<path-to-dvrk_matlab>');
 rosinit;
 ```
 
+If you installed the dVRK stack using the instructions online, dVRK matlab is under `~/catkin_ws/src` so yuo can type:
+```
+addpath('~/catkin_ws/src/dvrk-ros/dvrk_matlab/')
+rosinit;
+```
+
 -----
 ## 3. Runing MATLAB Script Program
 
