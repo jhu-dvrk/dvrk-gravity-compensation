@@ -156,7 +156,7 @@ classdef controller < handle
             elseif joint_vel > bd_vel && joint_vel < sat_vel
                 sign_vel = 0.5*fric_comp_ratio*(joint_vel-bd_vel)/(sat_vel-bd_vel)+0.5;
             elseif joint_vel < -bd_vel && joint_vel > -sat_vel
-                sign_vel = -0.5*fric_comp_ratio*(joint_vel-bd_vel)/(sat_vel-bd_vel)+0.5;
+                sign_vel = -0.5*fric_comp_ratio*(-joint_vel-bd_vel)/(sat_vel-bd_vel)+0.5;
             end
         end
 
