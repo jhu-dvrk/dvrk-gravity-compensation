@@ -167,7 +167,7 @@ function gc_dynamic_params = param_vec_checking(input_vec, rows, columns)
     elseif rows==columns_t && rows == columns_t
         gc_dynamic_params = input_vec';
     else
-        error("size of dynamic vector is not correct. Current size is (%d, %d). Vector size for gc controller should be (%d, %d)",...
+        error('size of dynamic vector is not correct. Current size is (%d, %d). Vector size for gc controller should be (%d, %d)',...
                 rows_t, columns_t, rows, columns);
     end
 end
