@@ -21,7 +21,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
     ARM_NAME = config.ARM_NAME;
 
     % Create unique date folder to store the collecting data
-    date_time = datestr(datetime('now'),'mmmm-dd-yyyy-HH:MM:SS');
+    date_time = datestr(datetime('now'),'mmmm-dd-yyyy-HH-MM-SS');
     [MTM_data_path,~,~] = fileparts(dataCollection_config_str);
     input_data_path_with_date = [MTM_data_path,'/',date_time];
     mkdir(input_data_path_with_date);
