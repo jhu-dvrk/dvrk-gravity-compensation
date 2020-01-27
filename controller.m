@@ -48,8 +48,8 @@ classdef controller < handle
             for i=1:size(obj.dynamic_params_pos_vec,1)
                 fprintf('Param_%d: [%0.5f], [%0.5f]\n', i, obj.dynamic_params_pos_vec(i), obj.dynamic_params_neg_vec(i));
             end
-            obj.pub_tor = rospublisher(['/dvrk/',ARM_NAME,'/set_effort_joint']);
-            obj.sub_pos = rossubscriber(['/dvrk/',ARM_NAME,'/state_joint_current']);
+            obj.pub_tor = rospublisher([ARM_NAME,'/set_effort_joint']);
+            obj.sub_pos = rossubscriber([ARM_NAME,'/state_joint_current']);
             if any(db_vel_vec)<0 
                 error('db_vel_vec should not be negative')
             else
@@ -166,12 +166,12 @@ classdef controller < handle
             % Apply GC controllers
             callback_MTM = @(src,msg)(obj.callback_gc_publisher(msg.Position,...
                 msg.Velocity));
-            obj.sub_pos = rossubscriber(['/dvrk/',obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
         end
 
         % call this function to stop the gc controller and move to origin pose
         function stop_gc(obj)
-            obj.sub_pos = rossubscriber(['/dvrk/',obj.ARM_NAME,'/state_joint_current']);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current']);
             obj.mtm_arm.move_joint([0,0,0,0,0,0,0]);
             disp('gc_controller stopped');
         end
@@ -183,7 +183,7 @@ classdef controller < handle
             obj.is_drift_vel_exceed_limit = false;
             callback_MTM = @(src,msg)(obj.callback_gc_pub_with_vel_safestop(msg.Position,...
                                                                             msg.Velocity));
-            obj.sub_pos = rossubscriber(['/dvrk/',obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
         end
         
         function set_zero_tor_output_joint(obj, Zero_Output_Joint_No)
