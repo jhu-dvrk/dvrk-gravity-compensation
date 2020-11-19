@@ -39,8 +39,8 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     config.SN = SN;
 
     % Initiate the arm object and move to origin pose
-    mtm_arm = mtm(ARM_NAME);
-    mtm_arm.move_joint(deg2rad(joint_origin_pose));
+    mtm_arm = dvrk.mtm(ARM_NAME);
+    mtm_arm.move_jp(deg2rad(joint_origin_pose)).wait();
 
     % Identify the hard limit, [config.data_collection.joint5.theta_angle_max],
     % to prevent hitting upper panel of cartesian space
@@ -133,7 +133,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
             ARM_NAME,...
             default_value,...
             goal_msg);
-        mtm_arm.move_joint(deg2rad(joint_tele_pose));
+        mtm_arm.move_jp(deg2rad(joint_tele_pose)).wait();
     end
 
     % Identify the hard limit, [config.data_collection.joint1.train_angle_max.MTMR],
@@ -152,7 +152,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
             ARM_NAME,...
             default_value,...
             goal_msg);
-        mtm_arm.move_joint(deg2rad(joint_tele_pose));
+        mtm_arm.move_jp(deg2rad(joint_tele_pose)).wait();
     end
 
     % Identify the hard limit, [config.data_collection.joint1.train_angle_max.MTML],
@@ -171,7 +171,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
             ARM_NAME,...
             default_value,...
             goal_msg);
-        mtm_arm.move_joint(deg2rad(joint_tele_pose));
+        mtm_arm.move_jp(deg2rad(joint_tele_pose)).wait();
     end
 
     % Identify the hard limit, [config.data_collection.joint1.train_angle_min.MTMR],
@@ -190,7 +190,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
             ARM_NAME,...
             default_value,...
             goal_msg);
-        mtm_arm.move_joint(deg2rad(joint_tele_pose));
+        mtm_arm.move_jp(deg2rad(joint_tele_pose)).wait();
     end
 
     % Final result output display
@@ -210,7 +210,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
 
 
     % Execute collision checking process
-    collision_checking(config);
+    collision_checking(config, mtm_arm);
 
     % Save customized json output file for further data_collection process
     output_file_str = [output_data_path_mtm, '/dataCollection_config_customized.json'];
@@ -219,6 +219,8 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     fwrite(fid, jsonStr);
     fclose(fid);
     fprintf('Save config file to %s\n', output_file_str);
+
+    delete(mtm_arm)
 end
 
 function customized_value = wizard_move_one_joint(mtm_arm,...
@@ -232,7 +234,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
     input_str = '';
     fprintf('Setting Hard limit for when collecting data of Joint#%d\n', Joint_No)
     fprintf('Moving to init pose\n');
-    mtm_arm.move_joint(deg2rad(joint_init_pos));
+    mtm_arm.move_jp(deg2rad(joint_init_pos)).wait();
     if(~exist('is_couple_limit', 'var'))
         customized_value = joint_init_pos(Joint_No);
     else
@@ -270,7 +272,7 @@ function customized_value = wizard_move_one_joint(mtm_arm,...
         else
             joint_pos(Joint_No) = customized_value - joint_pos(Joint_No-1);
         end
-        mtm_arm.move_joint(deg2rad(joint_pos));
+        mtm_arm.move_jp(deg2rad(joint_pos)).wait();
         input_str = '';
     end
 end
@@ -287,7 +289,7 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
     input_str = '';
     fprintf('Setting Hard limit for when collecting data of Joint#%d\n', 3);
     disp('Moving to init pose');
-    mtm_arm.move_joint(deg2rad(joint_init_pos));
+    mtm_arm.move_jp(deg2rad(joint_init_pos)).wait();
     customized_value = joint_init_pos(2);
     joint_pos = joint_init_pos;
     fprintf('Instruction: %s\n', goal_msg);
@@ -323,7 +325,7 @@ function customized_value = wizard_move_two_joint(mtm_arm,...
             joint_pos(2) = customized_value;
             joint_pos(3) = couple_contraint - joint_pos(2);
         end
-        mtm_arm.move_joint(deg2rad(joint_pos));
+        mtm_arm.move_jp(deg2rad(joint_pos)).wait();
         input_str = '';
     end
 end
@@ -339,7 +341,7 @@ function argument_checking(ARM_NAME,...
     end
 end
 
-function collision_checking(config)
+function collision_checking(config, mtm_arm)
     %  Institute: The Chinese University of Hong Kong
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
@@ -353,8 +355,7 @@ function collision_checking(config)
     input_data_path = 'test';
 
     % create mtm_arm obj and move every arm in home joint position
-    mtm_arm = mtm(ARM_NAME);
-    mtm_arm.move_joint([0,0,0,0,0,0,0]);
+    mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
 
     config_joint_list = setting_dataCollection(config,...
                                                input_data_path);
@@ -362,7 +363,7 @@ function collision_checking(config)
     current_progress = 0.0;
     total_data_sets = 0;
     for j=1:size(config_joint_list, 2)
-        total_data_sets = total_data_sets + config_joint_list{j}.data_size; 
+        total_data_sets = total_data_sets + config_joint_list{j}.data_size;
     end
     one_data_progress_increment = 100 / total_data_sets;
     for i = 1:size(config_joint_list, 2)
@@ -373,7 +374,7 @@ function collision_checking(config)
                               current_progress,...
                               one_data_progress_increment);
     end
-    mtm_arm.move_joint([0,0,0,0,0,0,0]);
+    mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
 
 end
 

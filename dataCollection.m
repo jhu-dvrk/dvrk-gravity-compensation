@@ -38,8 +38,8 @@ function output_file_str = dataCollection(dataCollection_config_str)
     fprintf('Save config file to %s\n', output_file_str);
 
     % Create mtm_arm obj and move every arm in home position for safety reason
-    mtm_arm = mtm(ARM_NAME);
-    mtm_arm.move_joint([0,0,0,0,0,0,0]);
+    mtm_arm = dvrk.mtm(ARM_NAME);
+    mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
 
     config_joint_list = setting_dataCollection(config,...
                                                input_data_path_with_date);
@@ -61,7 +61,8 @@ function output_file_str = dataCollection(dataCollection_config_str)
                                   current_progress,...
                                   one_data_progress_increment);
     end
-    mtm_arm.move_joint([0,0,0,0,0,0,0]);
+    mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
+    delete(mtm_arm);
 end
 
 function argument_checking(dataCollection_config_str)

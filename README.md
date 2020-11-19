@@ -1,27 +1,26 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+<!--ts-->
+   * [Overview](#overview)
+   * [Usage](#usage)
+      * [1. launch dVRK console](#1-launch-dvrk-console)
+      * [2.Initialize Matlab](#2initialize-matlab)
+      * [3. Runing Matlab Script Program](#3-runing-matlab-script-program)
+         * [A) <strong>[wizard_config_dataCollection]</strong> (require user input)](#a-wizard_config_datacollection-require-user-input)
+            * [A) Step #1:](#a-step-1)
+            * [A) Step #2:](#a-step-2)
+            * [A) Step #3:](#a-step-3)
+            * [A) Step #4:](#a-step-4)
+            * [A) Step #5:](#a-step-5)
+            * [A) Step #6:](#a-step-6)
+         * [B) <strong>[dataCollection]</strong> (auto):](#b-datacollection-auto)
+         * [C) Process#3 <strong>[mlse]</strong> (auto):](#c-process3-mlse-auto)
+         * [D) Process#4 <strong>[gc_controller]</strong> (auto):](#d-process4-gc_controller-auto)
+   * [Loading the gravity compensation configuration file in dVRK console](#loading-the-gravity-compensation-configuration-file-in-dvrk-console)
+      * [Estimation using existing collected data folder](#estimation-using-existing-collected-data-folder)
+   * [Contact](#contact)
 
-- [Overview](#overview)
-- [Usage](#usage)
-  - [1. launch dVRK console](#1-launch-dvrk-console)
-  - [2.Initialize MATLAB](#2initialize-matlab)
-  - [3. Runing MATLAB Script Program](#3-runing-matlab-script-program)
-    - [A) **[wizard\_config\_dataCollection]** (require user input)](#a-wizard%5C_config%5C_datacollection-require-user-input)
-      - [A) Step #1:](#a-step-1)
-      - [A) Step #2:](#a-step-2)
-      - [A) Step #3:](#a-step-3)
-      - [A) Step #4:](#a-step-4)
-      - [A) Step #5:](#a-step-5)
-      - [A) Step #6:](#a-step-6)
-    - [B) **[dataCollection]** (auto):](#b-datacollection-auto)
-    - [C) Process#3 **[mlse]** (auto):](#c-process3-mlse-auto)
-    - [D) Process#4 **[gc_controller]** (auto):](#d-process4-gc_controller-auto)
-- [Loading the gravity compensation configuration file in dVRK console](#loading-the-gravity-compensation-configuration-file-in-dvrk-console)
-  - [Estimation using existing collected data folder](#estimation-using-existing-collected-data-folder)
-- [Contact](#contact)
+<!-- Added by: anton, at: 2020-11-19T09:39-05:00 -->
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!--te-->
 
 # Overview
 This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(GC) of Master Tool Manipulator(MTM) for dVRK. Compared to former work, our repository solves following problems:
@@ -57,24 +56,23 @@ $rosrun dvrk_robot dvrk_console_json -j <path_to_your_console_config.json>
 After opening console, press `home` button to turn on MTM arms and move them to home position.
 
 -----
-## 2.Initialize MATLAB
+## 2.Initialize Matlab
 
-Open MATLAB and go to the folder, _dvrk\_gravity\_compensation_.
+Open Matlab and go to the folder, _dvrk\_gravity\_compensation_.
 
 Then initialize the system:
 ```
-addpath('<path-to-dvrk_matlab>');
 rosinit;
 ```
 
-If you installed the dVRK stack using the instructions online, dVRK matlab is under `~/catkin_ws/src` so you can type:
-```
-addpath('~/catkin_ws/src/dvrk-ros/dvrk_matlab/')
-rosinit;
-```
+Make sure your path in Matlab is set properly and you've added support for CRTK messages.  See:
+* CRTK Matlab: https://github.com/collaborative-robotics/crtk_matlab_client
+  * Matlab up to 2020a: https://github.com/collaborative-robotics/crtk_matlab_client/blob/master/custom_msgs_up_to_2020a.md
+  * Matlab 2020b and up: https://github.com/collaborative-robotics/crtk_matlab_client/blob/master/custom_msgs_2020b_and_up.md
+* dVRK Matlab: https://github.com/jhu-dvrk/dvrk-ros/tree/master/dvrk_matlab
 
 -----
-## 3. Runing MATLAB Script Program
+## 3. Runing Matlab Script Program
 
 
 Run the whole program in one command
@@ -108,7 +106,7 @@ After you step into this process, you will go through some instructions to set j
 -----
 
 #### A) Step #1:
-MATLAB console:
+Matlab console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_1.png" width="1000"  />
 </p>
@@ -128,7 +126,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 
 ----------
 #### A) Step #2:
-MATLAB console:
+Matlab console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_2.png" width="1000"  />
  </p>
@@ -140,7 +138,7 @@ Set the joint limit when distal link of MTM is around 10cm away from front panel
 
 ----------
 #### A) Step #3:
-MATLAB console:
+Matlab console:
 <p align="center">
   <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_3.png" width="1000"  />
  </p>
@@ -152,7 +150,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 
 ----------
 #### A) Step #4:
-MATLAB console:
+Matlab console:
 <p align="center">
    <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_4.png" width="1000"  />
  </p>
@@ -164,7 +162,7 @@ Set the joint limit when distal link of MTM is around 10cm away from top panel.
 
 ----------
 #### A) Step #5:
-MATLAB console:
+Matlab console:
 <p align="center">
  <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_5.png"  />
  </p>
@@ -176,7 +174,7 @@ Set the joint limit when distal link of MTM is around 10cm away from left panel.
 
 ----------
 #### A) Step #6:
-MATLAB console:
+Matlab console:
 <p align="center">
   <img src="https://raw.githubusercontent.com/wiki/jhu-dvrk/dvrk-gravity-compensation/images/wizard_6.png" width="1000"  />
  </p>
@@ -222,9 +220,7 @@ For example:
         {
             "name": "MTMR",
             "type": "MTM",
-            "io": "sawRobotIO1394-MTMR-31519.xml",
-            "pid": "sawControllersPID-MTMR.xml",
-            "arm": "MTMR-31519.json"
+            "serial": "31519"
         }
 ......
 ```
@@ -243,11 +239,11 @@ To test the dVRK console with the new gravity compensation parameters, you can u
  * In a separate terminal, use `rostopic pub` to control the arm.  Remember that using the "tab" key will autocomplete the rostopic as well as the possible playloads so use hit the "tab" key over and over...
    * To turn gravity on/off (replace `true` by `false`), use:
    ```sh
-   rostopic pub /dvrk/MTMR/set_gravity_compensation std_msgs/Bool "data: true" -1
+   rostopic pub /dvrk/MTMR/use_gravity_compensation std_msgs/Bool "data: true" -1
    ```
    * To activate the effort mode, send a zero wrench using:
    ```sh
-   rostopic pub /dvrk/MTMR/set_wrench_body geometry_msgs/Wrench "force:
+   rostopic pub /dvrk/MTMR/body/servo_cf geometry_msgs/Wrench "force:
      x: 0.0
      y: 0.0
      z: 0.0

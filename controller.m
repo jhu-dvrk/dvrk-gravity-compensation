@@ -48,13 +48,13 @@ classdef controller < handle
             for i=1:size(obj.dynamic_params_pos_vec,1)
                 fprintf('Param_%d: [%0.5f], [%0.5f]\n', i, obj.dynamic_params_pos_vec(i), obj.dynamic_params_neg_vec(i));
             end
-            obj.pub_tor = rospublisher([ARM_NAME,'/set_effort_joint']);
-            obj.sub_pos = rossubscriber([ARM_NAME,'/state_joint_current']);
-            if any(db_vel_vec)<0 
+            obj.pub_tor = rospublisher([ARM_NAME,'/servo_jf']);
+            obj.sub_pos = rossubscriber([ARM_NAME,'/measured_js']);
+            if any(db_vel_vec)<0
                 error('db_vel_vec should not be negative')
             else
                 obj.db_vel_vec = db_vel_vec;
-            end   
+            end
             if any(sat_vec_vec)<0 && any(sat_vec_vec)>1
                 error('sat_vec_vec should not be negative or smaller than db_vel_vec')
             else
@@ -93,7 +93,7 @@ classdef controller < handle
             end
             send(obj.pub_tor, msg);
         end
-        
+
                 % Callback function of pose subscriber when start gc controller
         function callback_gc_pub_with_vel_safestop(obj, q, q_dot)
             for i=1:7
@@ -101,8 +101,8 @@ classdef controller < handle
                     obj.is_drift_vel_exceed_limit = true;
                 end
             end
-            
-            if obj.is_drift_vel_exceed_limit 
+
+            if obj.is_drift_vel_exceed_limit
                 msg = rosmessage(obj.pub_tor);
                 for i =1:7
                     msg.Effort(i) = 0.0;
@@ -143,7 +143,7 @@ classdef controller < handle
             Torques(obj.Zero_Output_Joint_No) = 0;
         end
 
-        
+
         % %Deadband segmented friction function
         % sign_vel = 0~1
         function sign_vel = dbs_vel(obj, joint_vel, bd_vel, sat_vel, fric_comp_ratio)
@@ -166,16 +166,16 @@ classdef controller < handle
             % Apply GC controllers
             callback_MTM = @(src,msg)(obj.callback_gc_publisher(msg.Position,...
                 msg.Velocity));
-            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/measured_js'],callback_MTM,'BufferSize',10);
         end
 
         % call this function to stop the gc controller and move to origin pose
         function stop_gc(obj)
-            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current']);
-            obj.mtm_arm.move_joint([0,0,0,0,0,0,0]);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/measured_js']);
+            obj.mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
             disp('gc_controller stopped');
         end
-        
+
         % call this function to start the gc controller
         function start_gc_with_vel_safestop(obj, safe_vel_limit)
             % Apply GC controllers
@@ -183,9 +183,9 @@ classdef controller < handle
             obj.is_drift_vel_exceed_limit = false;
             callback_MTM = @(src,msg)(obj.callback_gc_pub_with_vel_safestop(msg.Position,...
                                                                             msg.Velocity));
-            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/state_joint_current'],callback_MTM,'BufferSize',10);
+            obj.sub_pos = rossubscriber([obj.ARM_NAME,'/measured_js'],callback_MTM,'BufferSize',10);
         end
-        
+
         function set_zero_tor_output_joint(obj, Zero_Output_Joint_No)
             obj.Zero_Output_Joint_No = Zero_Output_Joint_No
         end

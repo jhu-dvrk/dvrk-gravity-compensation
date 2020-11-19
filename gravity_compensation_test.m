@@ -13,7 +13,7 @@ function mtm_gc_controller = online_test_init(config)
     param_num = 40; % hardcode
     gc_dynamic_params_pos = param_vec_checking(config.GC_controller.gc_dynamic_params_pos, param_num, 1);
     gc_dynamic_params_neg = param_vec_checking(config.GC_controller.gc_dynamic_params_neg, param_num, 1);
-    mtm_arm = mtm(config.ARM_NAME);
+    mtm_arm = dvrk.mtm(config.ARM_NAME);
     mtm_gc_controller= controller(mtm_arm,...
         gc_dynamic_params_pos,...
         gc_dynamic_params_neg,...
@@ -57,20 +57,20 @@ function is_test_success = online_gc_predict_error_test(mtm_gc_controller, confi
         end
         fprintf('\n');
     end
-    
+
     fprintf('Test result: "relative error rate"\n');
     for i=1:7
         fprintf('Joint#%d\t', i);
     end
     fprintf('\n');
     for j=1:size(pos_name_cell)
- 
+
         for k = 1:7
             fprintf('%d%%\t', int32(rel_err_mat_MTM(k,j)*100));
         end
         fprintf('\n');
     end
-    
+
     for j=1:size(pos_name_cell)
         for k = 1:7
             if(int32(rel_err_mat_MTM(k,j)*100)>=config.GC_Test.ONLINE_GC_PRT_ERR.rel_err_threshold(k))
@@ -84,13 +84,13 @@ function is_test_success = online_gc_predict_error_test(mtm_gc_controller, confi
         end
     end
     % Move MTM to origin position
-    mtm_gc_controller.mtm_arm.move_joint(deg2rad(zeros(1,7)));
+    mtm_gc_controller.mtm_arm.move_jp(deg2rad(zeros(1,7))).wait();
 end
 
 % call this function to test the controller and calculate the absolute and relate error between predicted and measuring torques
 function [abs_err, rel_err] = online_gc_predict_error_controller(mtm_gc_controller, q, divider_const_vec)
     % Moving to test pose and waiting for 3 seconds until MTM remains static
-    mtm_gc_controller.mtm_arm.move_joint(q);
+    mtm_gc_controller.mtm_arm.move_jp(q).wait();
     pause(3);
     % Get joint position and velocity signal by ROS communication
     msg = receive(mtm_gc_controller.sub_pos);
@@ -105,7 +105,7 @@ end
 
 function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
     disp('Started test estimating drift at a start initial position');
-    mtm_gc_controller.mtm_arm.move_joint(deg2rad(config.GC_controller.GC_init_pos));
+    mtm_gc_controller.mtm_arm.move_jp(deg2rad(config.GC_controller.GC_init_pos)).wait();
     % pause(5.0); % to make sure PID is stable
     disp('Measuring drift...');
     mtm_gc_controller.start_gc_with_vel_safestop(config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
@@ -136,7 +136,7 @@ function is_test_success = online_gc_drift_test(mtm_gc_controller, config)
         is_test_success = false;
     end
     online_gc_drift_vel_plot(vel_mat, duration, delta_time, config.GC_Test.ONLINE_GC_DRT.safe_vel_limit);
-    
+
 end
 
 function online_gc_drift_vel_plot(vel_mat, duration, delta_time, safe_vel_limit)
@@ -144,7 +144,7 @@ function online_gc_drift_vel_plot(vel_mat, duration, delta_time, safe_vel_limit)
     for i = 1:7
         subplot(7,1,i);
         x = delta_time: delta_time:size(vel_mat, 2)*delta_time;
-        x_limit = delta_time: delta_time: duration; 
+        x_limit = delta_time: delta_time: duration;
         plot(x, vel_mat(i,:), x_limit, safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--', x_limit, -safe_vel_limit(i)*ones(1,size(x_limit,2)), 'r--');
         title(sprintf('Velocity of joint #%d for drift test within %.1f seconds', i, duration));
         if max(vel_mat(i,:),[],2) <=safe_vel_limit(i)
@@ -153,9 +153,9 @@ function online_gc_drift_vel_plot(vel_mat, duration, delta_time, safe_vel_limit)
             axis tight
         end
         if i==3
-            ylabel('Joint Velocity(rad/s)') 
+            ylabel('Joint Velocity(rad/s)')
         elseif i==7
-            xlabel('Time(s)') 
+            xlabel('Time(s)')
         end
     end
 end

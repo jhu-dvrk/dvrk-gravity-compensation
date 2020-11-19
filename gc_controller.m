@@ -30,13 +30,13 @@ function mtm_gc_controller = gc_controller(gc_controller_config_json)
     % General Setting
     GC_controllers = [];
     param_num = 40; %hard code
-    
+
     gc_dynamic_params_pos = param_vec_checking(config.GC_controller.gc_dynamic_params_pos, param_num, 1);
     gc_dynamic_params_neg = param_vec_checking(config.GC_controller.gc_dynamic_params_neg, param_num, 1);
-    
-    
+
+
     % % Spawn GC Controllers and test
-    mtm_arm = mtm(config.ARM_NAME);
+    mtm_arm = dvrk.mtm(config.ARM_NAME);
     mtm_gc_controller= controller(mtm_arm,...
         gc_dynamic_params_pos,...
         gc_dynamic_params_neg,...
@@ -49,7 +49,7 @@ function mtm_gc_controller = gc_controller(gc_controller_config_json)
         config.ARM_NAME);
 
     % Move to gc controller start joint position and wait until MTM remains static
-    mtm_gc_controller.mtm_arm.move_joint(deg2rad(config.GC_controller.GC_init_pos));
+    mtm_gc_controller.mtm_arm.move_jp(deg2rad(config.GC_controller.GC_init_pos)).wait();
     pause(2.5);
 
     % Start gc controller

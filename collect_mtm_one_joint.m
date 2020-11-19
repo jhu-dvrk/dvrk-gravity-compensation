@@ -73,7 +73,7 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
             config.Train_Joint_No, dir_name);
         disp('If the MTM hits the environment, please hit E-Button to stop instantly!');
     end
-    
+
     current_progress = input_progress;
 
     for  k = 1:size(joint_range_list,2)
@@ -92,9 +92,9 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
         %Planning the trajectory to pre-plan
         if is_collision_checking
             if (k==1 || k==size(joint_range_list,2))
-                mtm_arm.move_joint(joint_trajectory(:,1));
+                mtm_arm.move_jp(joint_trajectory(:,1)).wait();
                 % mtm_arm.move_joint(joint_trajectory(:,int32((1+end)/2)));
-                mtm_arm.move_joint(joint_trajectory(:,end));
+                mtm_arm.move_jp(joint_trajectory(:,end)).wait();
             end
         end
         if is_collecting_data
@@ -107,12 +107,12 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
                 datestr(datenum(0, 0, 0, 0, 0, toc), 'HH:MM:SS'));
             lastsize = 0; % to erase last printed line
             for i=1:sample_size
-                mtm_arm.move_joint(joint_trajectory(:,i));
+                mtm_arm.move_jp(joint_trajectory(:,i)).wait();
                 pause(steady_time);
                 for j=1:sample_num
                     pause(0.01); % pause 10ms assuming dVRK console publishes at about 100Hz so we get different samples
-                    [~, ~, desired_effort(:,i,j)] = mtm_arm.get_state_joint_desired();
-                    [current_position(:,i,j), ~, ~] = mtm_arm.get_state_joint_current();
+                    [~, ~, desired_effort(:,i,j)] = mtm_arm.setpoint_js();
+                    [current_position(:,i,j), ~, ~] = mtm_arm.measured_js();
                 end
                 fprintf(repmat('\b', 1, lastsize));
                 lastsize = fprintf('Angle %d (%5.2f%%), do not touch MTM..', int32(rad2deg(joint_trajectory(config.Train_Joint_No, i))), current_progress);
@@ -123,7 +123,7 @@ function output_progress = collect_mtm_one_joint_with_one_dir(config,...
             if exist(data_save_path)~=7
                 mkdir(data_save_path)
             end
-            current_date_time =datestr(datetime('now'),'mmmm-dd-yyyy-HH-MM-SS');
+            current_date_time = datestr(datetime('now'),'mmmm-dd-yyyy-HH-MM-SS');
             file_str = strcat(data_save_path,'/',sprintf('theta%d-',Theta),current_date_time,'.mat');
             save(file_str,...
                 'joint_trajectory','jranges_ranges','desired_effort',...

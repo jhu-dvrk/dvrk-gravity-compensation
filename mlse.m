@@ -68,7 +68,7 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
             Torques_data_mat = cat(3, Torques_data_mat, Torques_data_tmp);
         end
     end
-    
+
     [torque_upper_limit, torque_lower_limit] = traning_data_tor_limit(Torques_data_mat);
     config.GC_controller.safe_upper_torque_limit = round(torque_upper_limit,5);
     config.GC_controller.safe_lower_torque_limit = round(torque_lower_limit,5);
@@ -100,7 +100,7 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
         is_gc_test_pass = true;
         output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     end
-    
+
     % Save the output parameters for gravity compensation controller
     fid = fopen(output_file_str,'w');
     jsonStr = jsonencode(config);
@@ -120,7 +120,7 @@ function [dynamic_parameters_vec, Torques_data_mat] = lse_mtm_one_joint(config_l
     %  Institute: The Chinese University of Hong Kong
     %  Author(s):  Hongbin LIN, Vincent Hui, Samuel Au
     %  Created on: 2018-10-05
-    
+
     fprintf('LSE for joint %d started..\n', config_lse_joint.Joint_No);
 
     if ~exist('previous_config')
@@ -144,8 +144,8 @@ function [dynamic_parameters_vec, Torques_data_mat] = lse_model(config_lse_joint
 
     R2_augmented = [lse_obj.R2_augmented_pos; lse_obj.R2_augmented_neg];
     T2_augmented = [lse_obj.T2_augmented_pos; lse_obj.T2_augmented_neg];
-    
-    Torques_data_mat = cat(3,lse_obj.Torques_pos_data, lse_obj.Torques_neg_data); 
+
+    Torques_data_mat = cat(3,lse_obj.Torques_pos_data, lse_obj.Torques_neg_data);
 
     % Generate the input argument,input_param_map and input_param_rel_std_map, for LSE
     if exist('old_param_path')
@@ -458,7 +458,7 @@ end
 function [joint_position_upper_limit, joint_position_lower_limit] =  generate_joint_angle_limit(config)
     joint_position_upper_limit = zeros(1,7);
     joint_position_lower_limit = zeros(1,7);
-    
+
     if strcmp(config.ARM_NAME, 'MTML')
         joint_position_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTML;
         joint_position_upper_limit(2) = config.data_collection.joint2.train_angle_max;
@@ -476,8 +476,8 @@ function [joint_position_upper_limit, joint_position_lower_limit] =  generate_jo
         joint_position_lower_limit(6) = config.data_collection.joint6.train_angle_min;
         joint_position_lower_limit(7) = -400;
     end
-    
-   
+
+
     if strcmp(config.ARM_NAME, 'MTMR')
         joint_position_upper_limit(1) = config.data_collection.joint1.train_angle_max.MTMR;
         joint_position_upper_limit(2) = config.data_collection.joint2.train_angle_max;
