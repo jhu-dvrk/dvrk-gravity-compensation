@@ -1,6 +1,18 @@
 Change log
 ==========
 
+2.0.0 (2021-04-08)
+==================
+
+* API changes:
+  * None
+* Deprecated features:
+  * None
+* New features:
+  * Support for latest dVRK ROS topics and CRTK based dvrk matlab client over ROS
+* Bug fixes:
+  * Delete `arm` when done to avoid having subscriber callbacks in background
+
 1.0.1 (2019-07-04)
 ==================
 
