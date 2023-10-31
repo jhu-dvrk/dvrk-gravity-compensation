@@ -82,6 +82,14 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     config.GC_controller.joint_position_lower_limit = joint_position_lower_limit;
     config.version = '2.0';
 
+    output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
+    % Save the output parameters for gravity compensation controller
+    fid = fopen(output_file_str,'w');
+    jsonStr = jsonencode(config);
+    fwrite(fid, jsonStr);
+    fclose(fid);
+    fprintf('Save config file to %s\n', output_file_str);
+
     % Gravity compensation test
     fid = fopen('gc_test_config.json');
     if fid<3
@@ -95,19 +103,9 @@ function [output_file_str, is_gc_test_pass] = mlse(dataCollection_info_str)
     if ~gravity_compensation_test(config, 'ONLINE_GC_DRT')
         disp('WARNING: Gravity compensation test failed.  Be careful when using the generated parameters.')
         is_gc_test_pass  = false;
-        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'-not-trusted.json'];
     else
         is_gc_test_pass = true;
-        output_file_str = [input_data_path_with_date,'/gc-',config.ARM_NAME,'-',config.SN,'.json'];
     end
-
-    % Save the output parameters for gravity compensation controller
-    fid = fopen(output_file_str,'w');
-    jsonStr = jsonencode(config);
-    fwrite(fid, jsonStr);
-    fclose(fid);
-    fprintf('Save config file to %s\n', output_file_str);
-
 end
 
 function argument_checking(input_data_path_with_date)
@@ -505,4 +503,3 @@ function [torque_upper_limit, torque_lower_limit] = traning_data_tor_limit(Torqu
     torque_upper_limit = max(measure_tor_mat,[],2);
     torque_lower_limit = min(measure_tor_mat,[],2);
 end
-

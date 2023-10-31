@@ -38,7 +38,7 @@ function output_file_str = dataCollection(dataCollection_config_str)
     fprintf('Save config file to %s\n', output_file_str);
 
     % Create mtm_arm obj and move every arm in home position for safety reason
-    mtm_arm = dvrk.mtm(ARM_NAME);
+    mtm_arm = minimal_mtm(ARM_NAME);
     mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
 
     config_joint_list = setting_dataCollection(config,...

@@ -39,7 +39,7 @@ function output_file_str = wizard_config_dataCollection(ARM_NAME,...
     config.SN = SN;
 
     % Initiate the arm object and move to origin pose
-    mtm_arm = dvrk.mtm(ARM_NAME);
+    mtm_arm = minimal_mtm(ARM_NAME);
     mtm_arm.move_jp(deg2rad(joint_origin_pose)).wait();
 
     % Identify the hard limit, [config.data_collection.joint5.theta_angle_max],
@@ -377,4 +377,3 @@ function collision_checking(config, mtm_arm)
     mtm_arm.move_jp([0,0,0,0,0,0,0]).wait();
 
 end
-
