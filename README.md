@@ -36,27 +36,22 @@ This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(
 ## 1. launch dVRK console
 
 **Notes:**
-* You will need Matlab with the Robotic Toolkit to use ROS.  Version 2018b is known to work.  Matlab can be installed on the same computer as the dVRK controller (simpler) or on a different computer since the gravity compensation data collection used ROS to communicate with the dVRK controller.
+* You will need Matlab with the ROS Toolbox to use ROS. Matlab version 2025a on Ubuntu 24.04 with ROS Jazzy is known to work.  Matlab can be installed on the same computer as the dVRK controller (simpler) or on a different computer since the gravity compensation data collection used ROS to communicate with the dVRK controller.
+* The ROS Toolbox may require a different version of Python than your system version, you can use [pyenv](https://github.com/pyenv/pyenv) to install additional versions of Python without affecting existing Python installations. 
 * If you happen to have a full da Vinci master console, please power it and raise the stereo display as high as you can (using the two round buttons on the left side of the arm rest).  This will provide more space to move around the MTMs and identify the gravity compensation parameters.
 * If you have two MTMs, you will need to repeat the procedure for each arm.  While collecting data for one arm, try to keep the other arm all the way to the side.  This is to provide as much space as possible while avoiding collisions.
 
-
-Open a terminal to start roscore:
-```sh
-$ roscore
-```
-
-Open another terminal to launch dVRK console
+Open a terminal to launch dVRK console
 ```sh
 # if you have multiple controllers on your e-stop chain, close relays
-$ qlacloserelays
-#use a console config that contains the config file names of MTML and MTMR
+$ qlacommand -c close-relays
+# use a console config that contains the config file names of MTML and MTMR
 $rosrun dvrk_robot dvrk_console_json -j <path_to_your_console_config.json>
 ```
 After opening console, press `home` button to turn on MTM arms and move them to home position.
 
 -----
-## 2.Initialize Matlab
+## 2. Initialize Matlab
 
 Open Matlab and go to the folder, _dvrk\_gravity\_compensation_.
 
@@ -65,11 +60,7 @@ Then initialize the system:
 rosinit;
 ```
 
-Make sure your path in Matlab is set properly and you've added support for CRTK messages.  See:
-* CRTK Matlab: https://github.com/collaborative-robotics/crtk_matlab_client
-  * Matlab up to 2020a: https://github.com/collaborative-robotics/crtk_matlab_client/blob/master/custom_msgs_up_to_2020a.md
-  * Matlab 2020b and up: https://github.com/collaborative-robotics/crtk_matlab_client/blob/master/custom_msgs_2020b_and_up.md
-* dVRK Matlab: https://github.com/jhu-dvrk/dvrk-ros/tree/master/dvrk_matlab
+Make sure your path in Matlab is set properly and you've added support for CRTK messages.  See [CRTK Matlab client](https://crtk-robotics.readthedocs.io/en/latest/pages/clients.html#custom-message-generation).
 
 -----
 ## 3. Runing Matlab Script Program
@@ -96,6 +87,8 @@ Then the program starts. It will go through 4 processes:
 **C) [mlse]**
 
 **D) [gc_controller]**.
+
+> :warning: NOTE: Part D will fail with recent CRTK versions, this is ok - this step is just a demo/test of the GC controller, the calibation data is already saved. Once part D fails, go to [Loading the gravity compensation configuration file in dVRK console](#loading-the-gravity-compensation-configuration-file-in-dvrk-console).
 
 -----
 ### A) **[wizard\_config\_dataCollection]** (require user input)
@@ -206,7 +199,7 @@ To stop the gravity controller demo, you need to call `mtm_gc_controller.stop_gc
 After 4 processes are finished, **users can move their MTM by hand to feel their MTM is being gravity-Compensated**.
 
 # Loading the gravity compensation configuration file in dVRK console
-After the thrid process is finished, a GC configuration file will be generated according to the serial number of the MTM if GC controller can perform well with the parameters estimated in Process#3.
+After the third process is finished, a GC configuration file will be generated according to the serial number of the MTM if GC controller can perform well with the parameters estimated in Process#3.
 
 <!--**../GC_Data_stable/<ARM_NAME>_<SN>/<date&time>/gc-<ARM-Name>-<SN>.json**-->
 For example: `<path-to-dvrk_Gravity_Compensation>/../GC_Data_stable/MTML_41878/November-30-2018-10:57:53/gc-MTML-41878.json` will be generated for MTML-41878.
