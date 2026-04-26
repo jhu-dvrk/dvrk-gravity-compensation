@@ -248,8 +248,10 @@ def main() -> int:
                     if completed_target_points > 0:
                         elapsed = time.time() - collection_start_t
                         remaining_points = total_target_points - completed_target_points
-                        eta = elapsed * remaining_points / completed_target_points
-                        eta_text = _format_duration(eta)
+                        remaining_seconds = elapsed * remaining_points / completed_target_points
+                        eta_timestamp = time.time() + remaining_seconds
+                        eta_clock = time.strftime("%H:%M:%S", time.localtime(eta_timestamp))
+                        eta_text = f"{eta_clock}(remaining {_format_duration(remaining_seconds)})"
                     else:
                         eta_text = "estimating"
 
