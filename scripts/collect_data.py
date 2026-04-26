@@ -45,40 +45,34 @@ def _package_data_collection_template() -> Path:
     return Path(get_package_share_directory("dvrk_mtm_gc")) / "config" / "data_collection.json"
 
 
+def _workspace_serial_number(workspace: dict) -> str:
+    value = workspace.get("serialNumber")
+    if value is None:
+        raise KeyError("workspace.json missing serial number (expected: serialNumber)")
+    serial = str(value).strip()
+    if not serial:
+        raise ValueError("workspace.json serialNumber is empty")
+    return serial
+
+
 def _apply_workspace_ranges(config: dict, workspace: dict) -> dict:
     arm_name = str(workspace["arm"])
-    data_collection = config["data_collection"]
-    joint_ranges = workspace["jointRanges"]
+    serial_number = _workspace_serial_number(workspace)
 
-    config["ARM_NAME"] = arm_name
+    config["arm"] = arm_name
+    config["serialNumber"] = serial_number
     config["workspace"] = workspace
-
-    for joint_name, limits in joint_ranges.items():
-        if joint_name not in data_collection:
-            continue
-
-        block = data_collection[joint_name]
-        min_deg = float(limits["min_deg"])
-        max_deg = float(limits["max_deg"])
-
-        if isinstance(block.get("train_angle_min"), dict):
-            block["train_angle_min"][arm_name] = min_deg
-        else:
-            block["train_angle_min"] = min_deg
-
-        if isinstance(block.get("train_angle_max"), dict):
-            block["train_angle_max"][arm_name] = max_deg
-        else:
-            block["train_angle_max"] = max_deg
+    config.pop("ARM_NAME", None)
+    config.pop("SN", None)
 
     return config
 
 
 def _sample_arm(arm) -> tuple[np.ndarray, np.ndarray]:
-    setpoint = arm.setpoint_js()
-    measured = arm.measured_js()
-    effort = np.asarray(setpoint[2], dtype=float).reshape(7)
-    position = np.asarray(measured[0], dtype=float).reshape(7)
+    measured_pos, _ = arm.measured_jp()
+    measured_effort, _ = arm.measured_jf()
+    effort = measured_effort.reshape(7)
+    position = measured_pos.reshape(7)
     return position, effort
 
 
@@ -251,7 +245,7 @@ def main() -> int:
                         remaining_seconds = elapsed * remaining_points / completed_target_points
                         eta_timestamp = time.time() + remaining_seconds
                         eta_clock = time.strftime("%H:%M:%S", time.localtime(eta_timestamp))
-                        eta_text = f"{eta_clock}(remaining {_format_duration(remaining_seconds)})"
+                        eta_text = f"{eta_clock} ({_format_duration(remaining_seconds)}) remaining"
                     else:
                         eta_text = "estimating"
 

@@ -142,6 +142,28 @@ def _training_data_torque_limits(all_torques: np.ndarray) -> tuple[np.ndarray, n
     return upper, lower
 
 
+def _resolve_arm_and_serial(config: dict) -> tuple[str, str]:
+    workspace = config.get("workspace")
+    if not isinstance(workspace, dict):
+        raise KeyError("Missing workspace section in data info")
+
+    arm_raw = workspace.get("arm")
+    if arm_raw is None:
+        raise KeyError("Missing arm in workspace section")
+
+    serial_raw = workspace.get("serialNumber")
+    if serial_raw is None:
+        raise KeyError("Missing serialNumber in workspace section")
+
+    arm = str(arm_raw).strip()
+    serial = str(serial_raw).strip()
+    if not arm:
+        raise ValueError("workspace.arm is empty")
+    if not serial:
+        raise ValueError("workspace.serialNumber is empty")
+    return arm, serial
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Phase 3: identify gravity compensation parameters")
     parser.add_argument("--data-info", required=True, help="Path to dataCollection_info.json")
@@ -154,6 +176,9 @@ def main() -> int:
     data_root = data_info_path.parent
 
     config = load_json(data_info_path)
+    arm_name, serial_number = _resolve_arm_and_serial(config)
+    config["arm"] = arm_name
+    config["serialNumber"] = serial_number
     config["lse"] = load_json(args.mlse_config)["lse"]
     config["GC_controller"] = load_json(args.gc_controller_config)["GC_controller"]
     config["GC_Test"] = load_json(args.gc_test_config)["GC_Test"]
@@ -189,7 +214,7 @@ def main() -> int:
     config["GC_controller"]["gc_dynamic_params_pos"] = output_dynamic_matrix[0:40, 0].tolist()
     config["GC_controller"]["gc_dynamic_params_neg"] = np.concatenate([output_dynamic_matrix[0:10, 0], output_dynamic_matrix[40:70, 0]]).tolist()
 
-    output_file = data_root / f"gc-{config['ARM_NAME']}-{config['SN']}.json"
+    output_file = data_root / f"gc-{arm_name}-{serial_number}.json"
     save_json(output_file, config)
     print(f"Saved GC parameter file: {output_file}")
     print("Next: run scripts/gc_test.py")

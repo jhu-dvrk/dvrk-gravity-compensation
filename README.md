@@ -87,7 +87,7 @@ ros2 run dvrk_mtm_gc collect_data --config ./data_collection.json
 Run MLSE-style identification offline from a collected dataset:
 
 ```sh
-ros2 run dvrk_mtm_gc identify_params \
+ros2 run dvrk_mtm_gc identify_parameters \
   --data-info ../GC_data_stable/MTML_12345/timestamp/dataCollection_info.json
 ```
 

@@ -40,8 +40,7 @@ def _parse_args() -> argparse.Namespace:
         description="Phase 1: explore joint free-space and save workspace ranges"
     )
     parser.add_argument("-a", "--arm", required=True, choices=["MTML", "MTMR"], help="Arm name")
-    parser.add_argument("--rate", type=float, default=500.0, help="Servo refresh rate in Hz")
-    parser.add_argument("--output-dir", default=".", help="Directory where workspace.json is saved")
+    parser.add_argument("-s", "--serial", required=True, help="Serial number")
     return parser.parse_args()
 
 
@@ -119,8 +118,7 @@ def main() -> int:
             # Define exploration setpoints based on the joint being explored
             q_exploration_setpoint = np.zeros(7)
             if joint_index == 1 or joint_index == 2:
-                q_exploration_setpoint[3] = np.radians(80.0)
-                q_exploration_setpoint[4] = np.radians(180.0)
+                q_exploration_setpoint[4] = np.radians(90.0)
             
             print(f"Moving to exploration setup for joint {joint_no}...")
             arm.move_jp(q_exploration_setpoint).wait()
@@ -130,7 +128,7 @@ def main() -> int:
             min_rad = float("inf")
             max_rad = float("-inf")
             
-            rate = ral.create_rate(args.rate)
+            rate = ral.create_rate(500.0)
             while not ral.is_shutdown():
                 if _is_keypress_pending():
                     sys.stdin.read(1) # Consume the key
@@ -163,14 +161,15 @@ def main() -> int:
     payload = {
         "userId": _current_unix_user_id(),
         "arm": args.arm,
+        "serialNumber": args.serial,
         "startedAt": started_at,
         "collectedAt": datetime.now().isoformat(),
         "durationSec": float(time.time() - total_start_t),
-        "rateHz": float(args.rate),
+        "rateHz": 500.0,
         "jointRanges": ranges,
     }
 
-    out_dir = Path(args.output_dir).resolve()
+    out_dir = Path(".").resolve()
     # Create a sub-directory based on the start time
     timestamp = datetime.fromisoformat(started_at).strftime("%Y-%m-%d_%H-%M-%S")
     out_dir = out_dir / timestamp

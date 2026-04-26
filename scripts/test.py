@@ -57,9 +57,10 @@ def _build_controller(gc_file: Path) -> tuple[dict, GravityCompController]:
 
 
 def _sample(arm):
-    measured = arm.measured_js()
-    q = np.asarray(measured[0], dtype=float).reshape(7)
-    qd = np.asarray(measured[1], dtype=float).reshape(7)
+    q, _ = arm.measured_jp()
+    qd, _ = arm.measured_jv()
+    q = q.reshape(7)
+    qd = qd.reshape(7)
     return q, qd
 
 

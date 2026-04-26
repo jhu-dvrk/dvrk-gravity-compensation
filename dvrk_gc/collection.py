@@ -31,7 +31,7 @@ class CollectionPlan:
     jobs: list[CollectJob]
 
 
-def _resolve_joint_plan(data_collection: dict, arm_name: str, root_path: Path) -> list[CollectJob]:
+def _resolve_joint_plan(data_collection: dict, workspace_joint_ranges: dict, arm_name: str, root_path: Path) -> list[CollectJob]:
     is_pos_dir = bool(data_collection["is_pos_dir"])
     is_neg_dir = bool(data_collection["is_neg_dir"])
     sample_num = int(data_collection["sample_num"])
@@ -44,10 +44,14 @@ def _resolve_joint_plan(data_collection: dict, arm_name: str, root_path: Path) -
         train_joint_no = int(block["Train_Joint_No"])
         theta_joint_no = int(block.get("Theta_Joint_No", 1))
 
-        train_min = arm_value(block["train_angle_min"], arm_name)
-        train_max = arm_value(block["train_angle_max"], arm_name)
+        workspace_joint_key = f"joint{train_joint_no}"
+        if workspace_joint_key not in workspace_joint_ranges:
+            raise KeyError(f"Missing {workspace_joint_key} in workspace.jointRanges")
+        train_limits = workspace_joint_ranges[workspace_joint_key]
+        train_min = float(train_limits["min_deg"])
+        train_max = float(train_limits["max_deg"])
         train_step = float(block["train_angle_delta"])
-        train_angle_list_deg = make_range_deg(float(train_min), float(train_max), train_step)
+        train_angle_list_deg = make_range_deg(train_min, train_max, train_step)
 
         if train_joint_no in (1, 2):
             theta_angle_list_deg = [0.0]
@@ -92,8 +96,14 @@ def _resolve_joint_plan(data_collection: dict, arm_name: str, root_path: Path) -
 
 
 def build_collection_plan(config: dict, root_path: Path) -> CollectionPlan:
-    arm_name = str(config["ARM_NAME"])
-    jobs = _resolve_joint_plan(config["data_collection"], arm_name, root_path)
+    workspace = config.get("workspace")
+    if not isinstance(workspace, dict):
+        raise KeyError("Missing workspace section in config")
+    workspace_joint_ranges = workspace.get("jointRanges")
+    if not isinstance(workspace_joint_ranges, dict):
+        raise KeyError("Missing workspace.jointRanges in config")
+    arm_name = str(workspace["arm"])
+    jobs = _resolve_joint_plan(config["data_collection"], workspace_joint_ranges, arm_name, root_path)
     return CollectionPlan(arm_name=arm_name, output_root=root_path, jobs=jobs)
 
 

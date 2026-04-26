@@ -27,7 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'collect_data = scripts.collect_data:main',
-            'identify_params = scripts.identify_params:main',
+            'identify_parameters = scripts.identify_parameters:main',
             'define_workspace = scripts.define_workspace:main',
             'test = scripts.test:main',
         ],
