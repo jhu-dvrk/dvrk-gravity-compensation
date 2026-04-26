@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>dvrk_mtm_gc</name>
+  <version>1.1.0</version>
+  <description>Gravity compensation for dVRK MTM arms</description>
+  <maintainer email="anton.deguet@jhu.edu">Anton Deguet</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>ament_index_python</depend>
+  <depend>dvrk_python_client</depend>
+  <depend>crtk_python_client</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

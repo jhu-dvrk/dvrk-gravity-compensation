@@ -1,5 +1,13 @@
 <!--ts-->
    * [Overview](#overview)
+  * [Python Workflow (New)](#python-workflow-new)
+    * [Prerequisites](#prerequisites)
+    * [Install Python Dependencies](#install-python-dependencies)
+    * [Phase 1: Setup Workspace Limits](#phase-1-setup-workspace-limits)
+    * [Phase 2: Collect Data](#phase-2-collect-data)
+    * [Phase 3: Identify Parameters](#phase-3-identify-parameters)
+    * [Phase 4: Test Gravity Compensation](#phase-4-test-gravity-compensation)
+    * [Python Config Files](#python-config-files)
    * [Usage](#usage)
       * [1. launch dVRK console](#1-launch-dvrk-console)
       * [2.Initialize Matlab](#2initialize-matlab)
@@ -29,6 +37,86 @@ This _dvrk\_gravity\_compensation_ package is designed for gravity compensation(
 * New data collection strategy of 7 DOF serial manipulator for further estimation
 * Multi-steps least square estimation
 * Low-Friction Zero-Gravity controller
+
+# Python Workflow (New)
+
+The repository provides a ROS 2 package called `dvrk_mtm_gc`.
+
+## Prerequisites
+
+* dVRK console running and arm homed
+* ROS 2 environment sourced
+
+## Setup and Installation
+
+Follow standard ROS 2 package build process:
+
+```sh
+# Inside your workspace root
+colcon build --packages-select dvrk_mtm_gc
+source install/setup.bash
+```
+
+## Phase 1: Setup Workspace Limits
+
+Collect workspace ranges by exploring all joints one-by-one.
+The script does not load a config file; it saves `workspace.json`:
+
+```sh
+ros2 run dvrk_mtm_gc define_workspace -a MTML
+```
+
+During execution, the script:
+
+* homes the arm
+* moves to zero position
+* continuously updates servo commands so the current joint follows measured position while the other joints are held
+* asks the user to move each joint and press any key to continue to the next one
+* saves explored min/max for all joints to a timestamped folder under `workspace.json`
+
+## Phase 2: Collect Data
+
+Run automated collection using the workspace configurations:
+
+```sh
+ros2 run dvrk_mtm_gc collect_data --config ./data_collection.json
+```
+
+## Phase 3: Identify Parameters
+
+Run identification offline from a collected dataset:
+
+```sh
+ros2 run dvrk_mtm_gc identify_params \
+  --data-info ../GC_data_stable/MTML_12345/timestamp/dataCollection_info.json
+```
+
+## Phase 4: Test Gravity Compensation
+
+Run gravity compensation test with identified parameters:
+
+```sh
+ros2 run dvrk_mtm_gc test --arm MTML --gc-file .../gc-MTML-12345.json
+```
+
+## Phase 4: Test Gravity Compensation
+
+Run gravity compensation test with identified parameters:
+
+```sh
+ros2 run dvrk_mtm_gc test --arm MTML --gc-file .../gc-MTML-12345.json
+```
+
+## Python Config Files
+
+Default Python config files are stored in `config/`:
+
+* `config/data_collection.json`
+* `config/mlse.json`
+* `config/gc_controller.json`
+* `config/gc_test.json`
+
+The Python scripts can also accept alternate config file paths via command line arguments.
 
 # Usage
 
