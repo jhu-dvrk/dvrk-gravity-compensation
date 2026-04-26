@@ -84,7 +84,7 @@ ros2 run dvrk_mtm_gc collect_data --config ./data_collection.json
 
 ## Phase 3: Identify Parameters
 
-Run identification offline from a collected dataset:
+Run MLSE-style identification offline from a collected dataset:
 
 ```sh
 ros2 run dvrk_mtm_gc identify_params \
@@ -93,7 +93,7 @@ ros2 run dvrk_mtm_gc identify_params \
 
 ## Phase 4: Test Gravity Compensation
 
-Run gravity compensation test with identified parameters:
+Run drift-style gravity compensation test with identified parameters:
 
 ```sh
 ros2 run dvrk_mtm_gc test --arm MTML --gc-file .../gc-MTML-12345.json
