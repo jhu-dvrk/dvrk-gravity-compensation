@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
 import numpy as np
+
+from ament_index_python.packages import get_package_share_directory
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -14,6 +17,10 @@ if str(ROOT) not in sys.path:
 from dvrk_gc.config import load_json, save_json
 from dvrk_gc.lse import lse
 from dvrk_gc.regressor import analytical_regressor_mat_dual_dir
+
+
+def _package_config_template(config_name: str) -> Path:
+    return Path(get_package_share_directory("dvrk_mtm_gc")) / "config" / config_name
 
 
 def _list_data_files(path: Path) -> list[Path]:
@@ -166,22 +173,41 @@ def _resolve_arm_and_serial(config: dict) -> tuple[str, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Phase 3: identify gravity compensation parameters")
-    parser.add_argument("--data-info", required=True, help="Path to dataCollection_info.json")
-    parser.add_argument("--mlse-config", default="mlse_config.json")
-    parser.add_argument("--gc-controller-config", default="gc_controller_config.json")
-    parser.add_argument("--gc-test-config", default="gc_test_config.json")
+    parser.add_argument("-d", "--dir", required=True, help="Data directory with collected files and generated config")
     args = parser.parse_args()
 
-    data_info_path = Path(args.data_info).resolve()
-    data_root = data_info_path.parent
+    data_root = Path(args.dir).resolve()
+    data_root.mkdir(parents=True, exist_ok=True)
+
+    data_info_path = data_root / "data_collection.json"
+    if not data_info_path.exists():
+        raise FileNotFoundError(f"Missing data collection file: {data_info_path}")
+
+    mlse_config_path = data_root / "mlse.json"
+    if not mlse_config_path.exists():
+        template_path = _package_config_template("mlse.json")
+        shutil.copyfile(template_path, mlse_config_path)
+        print(f"[progress] Copied default config to {mlse_config_path}", flush=True)
+
+    gc_controller_config_path = data_root / "gc_controller.json"
+    if not gc_controller_config_path.exists():
+        template_path = _package_config_template("gc_controller.json")
+        shutil.copyfile(template_path, gc_controller_config_path)
+        print(f"[progress] Copied default config to {gc_controller_config_path}", flush=True)
+
+    gc_test_config_path = data_root / "gc_test.json"
+    if not gc_test_config_path.exists():
+        template_path = _package_config_template("gc_test.json")
+        shutil.copyfile(template_path, gc_test_config_path)
+        print(f"[progress] Copied default config to {gc_test_config_path}", flush=True)
 
     config = load_json(data_info_path)
     arm_name, serial_number = _resolve_arm_and_serial(config)
     config["arm"] = arm_name
     config["serialNumber"] = serial_number
-    config["lse"] = load_json(args.mlse_config)["lse"]
-    config["GC_controller"] = load_json(args.gc_controller_config)["GC_controller"]
-    config["GC_Test"] = load_json(args.gc_test_config)["GC_Test"]
+    config["lse"] = load_json(mlse_config_path)["lse"]
+    config["GC_controller"] = load_json(gc_controller_config_path)["GC_controller"]
+    config["GC_Test"] = load_json(gc_test_config_path)["GC_Test"]
 
     old_param_map: dict[int, float] = {}
     old_param_rel_std_map: dict[int, float] = {}
@@ -217,7 +243,7 @@ def main() -> int:
     output_file = data_root / f"gc-{arm_name}-{serial_number}.json"
     save_json(output_file, config)
     print(f"Saved GC parameter file: {output_file}")
-    print("Next: run scripts/gc_test.py")
+    print(f"Next step: ros2 run dvrk_mtm_gc test_drift -d {data_root}")
     return 0
 
 

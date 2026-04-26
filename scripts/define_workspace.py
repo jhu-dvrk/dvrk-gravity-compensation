@@ -184,6 +184,7 @@ def main() -> int:
         ral.shutdown()
 
     print("Workspace setup complete")
+    print(f"Next step: ros2 run dvrk_mtm_gc collect_data -d {args.data_dir}")
     return 0
 
 

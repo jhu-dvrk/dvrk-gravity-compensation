@@ -18,27 +18,7 @@ if str(ROOT) not in sys.path:
 
 from dvrk_gc.collection import build_collection_plan, build_joint_trajectory
 from dvrk_gc.config import load_json, save_json
-
-
-def _require_dvrk():
-    try:
-        import dvrk  # type: ignore
-        import crtk  # type: ignore
-    except Exception as exc:  # pragma: no cover
-        raise RuntimeError("dvrk_python import failed. Ensure dvrk_python is installed and sourced.") from exc
-    return dvrk, crtk
-
-
-def _create_arm_client(arm_name: str):
-    print("[progress] Loading dvrk_python modules", flush=True)
-    dvrk, crtk = _require_dvrk()
-
-    print("[progress] Creating CRTK RAL node", flush=True)
-    ral = crtk.ral("gc_collect_data")
-    print(f"[progress] Creating MTM client for arm '{arm_name}'", flush=True)
-    arm = dvrk.mtm(ral, arm_name)
-    print("[progress] MTM client created", flush=True)
-    return arm, ral
+from dvrk_gc.arm_utils import create_arm_client
 
 
 def _package_data_collection_template() -> Path:
@@ -192,7 +172,7 @@ def main() -> int:
     print(f"Planned target points: {total_target_points}", flush=True)
 
     print("[progress] Initializing robot connection", flush=True)
-    arm, ral = _create_arm_client(arm_name)
+    arm, ral = create_arm_client("gc_collect_data", arm_name)
 
     print(f"[progress] Checking RAL-level ROS topic connections for '{arm_name}'", flush=True)
     # Give the RAL node a moment to spin/initialize and discover topics
@@ -276,6 +256,7 @@ def main() -> int:
         print("[progress] Shutting down CRTK RAL", flush=True)
         ral.shutdown()
     print(f"Collection complete. Config file: {config_path}", flush=True)
+    print(f"Next step: ros2 run dvrk_mtm_gc identify_parameters -d {Path(config_path).parent}", flush=True)
     return 0
 
 

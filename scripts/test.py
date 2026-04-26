@@ -14,29 +14,21 @@ if str(ROOT) not in sys.path:
 
 from dvrk_gc.config import load_json
 from dvrk_gc.controller import GCControllerConfig, GravityCompController
+from dvrk_gc.arm_utils import create_arm_client, sample_arm
 
 
-def _require_dvrk():
-    try:
-        import dvrk  # type: ignore
-        import crtk  # type: ignore
-    except Exception as exc:  # pragma: no cover
-        raise RuntimeError("dvrk_python import failed. Ensure dvrk_python is installed and sourced.") from exc
-    return dvrk, crtk
-
-
-def _create_arm_client(arm_name: str):
-    dvrk, crtk = _require_dvrk()
-
-    # Newer dvrk_python APIs require a CRTK RAL object.
-    ral = crtk.ral("gc_test", namespace="/dvrk")
-    try:
-        arm = dvrk.mtm(ral, arm_name)
-        return arm, ral
-    except TypeError:
-        # Backward compatibility for older one-argument constructors.
-        arm = dvrk.mtm(arm_name)
-        return arm, None
+def _resolve_arm_and_serial(data_dir: Path) -> tuple[str, str]:
+    workspace_path = data_dir / "workspace.json"
+    if not workspace_path.exists():
+        print(f"Error: {workspace_path} not found. Run define_workspace.py first.")
+        sys.exit(1)
+    ws = load_json(workspace_path)
+    arm_name = ws.get("arm")
+    serial_number = ws.get("serialNumber")
+    if not arm_name or not serial_number:
+        print(f"Error: workspace.json is missing 'arm' or 'serialNumber'")
+        sys.exit(1)
+    return arm_name, str(serial_number)
 
 
 def _build_controller(gc_file: Path) -> tuple[dict, GravityCompController]:
@@ -56,60 +48,66 @@ def _build_controller(gc_file: Path) -> tuple[dict, GravityCompController]:
     return cfg, controller
 
 
-def _sample(arm):
-    q, _ = arm.measured_jp()
-    qd, _ = arm.measured_jv()
-    q = q.reshape(7)
-    qd = qd.reshape(7)
-    return q, qd
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Phase 4: run gravity compensation drift test")
-    parser.add_argument("--gc-file", required=True, help="Path to gc-ARM-SN.json")
-    parser.add_argument("--arm", required=True, choices=["MTML", "MTMR"], help="Arm name")
-    parser.add_argument("--duration", type=float, default=None, help="Override test duration (seconds)")
-    parser.add_argument("--dry-run", action="store_true", help="Validate config and print expected behavior")
+    parser = argparse.ArgumentParser(description="Phase 5: Manual test of gravity compensation")
+    parser.add_argument("-d", "--data-dir", required=True, help="Directory containing workspace.json and gc-*.json")
     args = parser.parse_args()
 
-    cfg, controller = _build_controller(Path(args.gc_file))
-    gc_test = cfg["GC_Test"]["ONLINE_GC_DRT"]
-    duration = float(args.duration if args.duration is not None else gc_test["duration"])
-    rate = float(gc_test["rate"])
-    safe_vel_limit = np.asarray(gc_test["safe_vel_limit"], dtype=float)
+    data_root = Path(args.data_dir).resolve()
+    arm_name, serial_number = _resolve_arm_and_serial(data_root)
 
-    if args.dry_run:
-        print(f"Controller loaded for {args.arm}")
-        print(f"Duration={duration}s, rate={rate}Hz")
-        return 0
+    gc_file = data_root / f"gc-{arm_name}-{serial_number}.json"
+    if not gc_file.exists():
+        print(f"Error: {gc_file} not found. Run identify_parameters.py first.")
+        return 1
 
-    arm, ral = _create_arm_client(args.arm)
+    cfg, controller = _build_controller(gc_file)
+    rate = float(cfg["GC_Test"]["ONLINE_GC_DRT"]["rate"])
 
-    init_deg = np.asarray(cfg["GC_controller"]["GC_init_pos"], dtype=float)
-    arm.move_jp(np.radians(init_deg)).wait()
+    arm, ral = create_arm_client("gc_test", arm_name)
 
+    print("\nStarting manual test.")
+    print("Commands:")
+    print("  'f' to FREE the arm (gravity compensation ENABLED)")
+    print("  'h' to HOLD the arm (gravity compensation DISABLED)")
+    print("  'q' to QUIT")
+
+    import select
+    
     period = 1.0 / max(rate, 1.0)
-    end_t = time.time() + duration
-    max_abs_vel = np.zeros(7, dtype=float)
+    is_free = False
+    
+    try:
+        while True:
+            # Check for user input without blocking
+            if select.select([sys.stdin], [], [], 0)[0]:
+                line = sys.stdin.readline().strip().lower()
+                if line == 'f':
+                    print("\nFREEing arm - gravity compensation ON", flush=True)
+                    arm.free()
+                    is_free = True
+                elif line == 'h':
+                    print("\nHOLDing arm - gravity compensation OFF", flush=True)
+                    arm.hold()
+                    is_free = False
+                elif line == 'q':
+                    break
+            
+            if is_free:
+                q, qd = sample_arm(arm)
+                tau = controller.compute_torque(q=q, qd=qd)
+                arm.servo_jf(tau)
+            
+            time.sleep(period)
+            
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print("\nShutting down...", flush=True)
+        arm.hold()
+        if ral:
+            ral.shutdown()
 
-    print("Running online gravity compensation drift test")
-    while time.time() < end_t:
-        q, qd = _sample(arm)
-        max_abs_vel = np.maximum(max_abs_vel, np.abs(qd))
-
-        if np.any(np.abs(qd) > safe_vel_limit):
-            print("Test failed: velocity limit exceeded")
-            return 2
-
-        tau = controller.compute_torque(q=q, qd=qd)
-        arm.servo_jf(tau)
-        time.sleep(period)
-
-    if ral is not None:
-        ral.shutdown()
-
-    print("Test passed")
-    print(f"Peak abs velocity: {max_abs_vel.tolist()}")
     return 0
 
 

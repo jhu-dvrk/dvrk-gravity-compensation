@@ -30,6 +30,7 @@ setup(
             'identify_parameters = scripts.identify_parameters:main',
             'define_workspace = scripts.define_workspace:main',
             'test = scripts.test:main',
+            'test_drift = scripts.test_drift:main',
         ],
     },
 )
